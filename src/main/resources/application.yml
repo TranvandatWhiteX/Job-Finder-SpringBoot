@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: job-finder
+  datasource:
+    url: ${POSTGRES_DB_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      username: ${MONGO_ROOT_USER}
+      password: ${MONGO_ROOT_PASSWORD}
+      uri: ${MONGO_DB_URL}
+      authentication-database: admin
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  mail:
+    host: localhost
+    port: 1025
+    username: tranvandat
+    password: tranvandat
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
+async:
+  config:
+    core-pool-size: ${ASYNC_CORE_POOL_SIZE:3}
+aws:
+  region: ${AWS_REGION}
+  accessKeyId: ${AWS_ACCESS_KEY_ID}
+  secretAccessKey: ${AWS_SECRET_ACCESS_KEY}
+  s3BucketName: ${AWS_BUCKET_NAME}
+jwt:
+  secret-key: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION_S}
+  refresh-key: ${JWT_REFRESH_SECRET}
+  expiration-rf-key: ${JWT_REFRESH_EXPIRATION_S}
+otp:
+  expiration: ${OTP_EXPIRATION_MINUTES}
+server:
+  port: ${PORT}
+socketio:
+  port: ${SOCKET_IO_PORT:9092}
+  host: ${SOCKET_IO_HOST:0.0.0.0}
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: alpha
+    tagsSorter: alpha
+    display-request-duration: true
