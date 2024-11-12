@@ -30,7 +30,7 @@ public class UserController {
     @PostMapping
     public ApiResponse<User> createUser(@RequestBody @Valid UserDto userDto,
                                         HttpServletRequest httpServletRequest) {
-        User user = userService.createUser(userDto);
+        User user = userService.createUser(userDto, httpServletRequest);
         return ApiResponse.<User>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())

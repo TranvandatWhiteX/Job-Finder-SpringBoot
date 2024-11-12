@@ -12,6 +12,10 @@ import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.RoleRepository;
 import com.dattran.job_finder_springboot.domain.repositories.UserRepository;
 import com.dattran.job_finder_springboot.domain.utils.FnCommon;
+import com.dattran.job_finder_springboot.domain.utils.HttpRequestUtil;
+import com.dattran.job_finder_springboot.logging.LoggingService;
+import com.dattran.job_finder_springboot.logging.entities.LogAction;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,8 +36,9 @@ public class UserService {
     RoleRepository roleRepository;
     BloomFilterService bloomFilterService;
     EmailService emailService;
+    LoggingService loggingService;
 
-    public User createUser(UserDto userDto) {
+    public User createUser(UserDto userDto, HttpServletRequest httpServletRequest)  {
         boolean isEmailExisted = bloomFilterService.isEmailExisted(userDto.getEmail());
         if (isEmailExisted) {
             throw new AppException(ResponseStatus.EMAIL_ALREADY_EXISTED);
@@ -66,6 +71,7 @@ public class UserService {
                 "OTP Verification",
                 "send-otp.html",
                 variables);
+        loggingService.writeLogEvent(savedUser.getId(), LogAction.CREATE, HttpRequestUtil.getClientIp(httpServletRequest), null, null, savedUser);
         return savedUser;
     }
 
