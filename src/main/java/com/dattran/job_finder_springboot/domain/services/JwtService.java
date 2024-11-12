@@ -80,7 +80,7 @@ public class JwtService {
     }
   }
 
-  public boolean verifyToken(String token, UserDetails userDetails, Boolean isRefreshToken) throws JOSEException, ParseException {
+  public boolean verifyToken(String token, Boolean isRefreshToken) throws JOSEException, ParseException {
     JWSVerifier verifier;
     if (isRefreshToken) {
       verifier = new MACVerifier(REFRESH_KEY.getBytes());
@@ -89,8 +89,7 @@ public class JwtService {
     }
     SignedJWT signedJWT = SignedJWT.parse(token);
     var verified = signedJWT.verify(verifier);
-    String username = signedJWT.getJWTClaimsSet().getSubject();
-    return username.equals(userDetails.getUsername()) && verified && !isTokenExpired(token);
+    return verified && !isTokenExpired(token);
   }
 
   public boolean isTokenExpired(String token) throws ParseException {

@@ -19,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -45,7 +42,7 @@ public class UserService {
         assert user != null;
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setUserState(UserState.PENDING);
-        Set<Role> roles = new HashSet<>();
+        List<Role> roles = new ArrayList<>();
         for (UserRole userRole : userDto.getRoles()) {
             Role role = roleRepository
                     .findByName(userRole.name())
@@ -78,6 +75,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
         if (otpService.validateOtp(user.getId(), verifyDto.getOtp())) {
             user.setUserState(UserState.ACTIVE);
+            user.setIsActive(true);
             userRepository.save(user);
             return VerifyResponse.builder()
                     .isVerified(true)
