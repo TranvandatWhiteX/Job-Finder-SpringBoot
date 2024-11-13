@@ -1,9 +1,10 @@
 package com.dattran.job_finder_springboot.domain.entities;
 
+import com.dattran.job_finder_springboot.domain.converters.AddressAttributeConverter;
 import com.dattran.job_finder_springboot.domain.enums.UserState;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseEntity implements UserDetails, Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -54,13 +56,15 @@ public class User extends BaseEntity implements UserDetails, Principal {
     @Column(name = "is_deleted")
     Boolean isDeleted = false;
 
-    String address;
-
     @Enumerated(EnumType.STRING)
     UserState userState;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Asset> assets;
+
+    @Convert(converter = AddressAttributeConverter.class)
+    @Column(columnDefinition = "jsonb")
+    Address address;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,6 +1,7 @@
 package com.dattran.job_finder_springboot.app.dtos;
 
 import com.dattran.job_finder_springboot.domain.enums.UserRole;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
