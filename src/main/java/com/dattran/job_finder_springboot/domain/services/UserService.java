@@ -16,7 +16,10 @@ import com.dattran.job_finder_springboot.domain.utils.HttpRequestUtil;
 import com.dattran.job_finder_springboot.domain.utils.JsonParser;
 import com.dattran.job_finder_springboot.logging.LoggingService;
 import com.dattran.job_finder_springboot.logging.entities.LogAction;
+import com.dattran.job_finder_springboot.logging.entities.ObjectName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.OnClose;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -72,7 +75,7 @@ public class UserService {
                 "OTP Verification",
                 "send-otp.html",
                 variables);
-        loggingService.writeLogEvent(savedUser.getId(), LogAction.CREATE, HttpRequestUtil.getClientIp(httpServletRequest), null, null, JsonParser.objectToMap(savedUser));
+        loggingService.writeLogEvent(savedUser.getId(), LogAction.CREATE, HttpRequestUtil.getClientIp(httpServletRequest), ObjectName.USER.name(), null, JsonParser.objectToMap(savedUser));
         return savedUser;
     }
 

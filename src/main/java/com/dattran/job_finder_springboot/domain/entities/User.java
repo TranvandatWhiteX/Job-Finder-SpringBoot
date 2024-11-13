@@ -38,7 +38,6 @@ public class User extends BaseEntity implements UserDetails, Principal {
 
     String email;
 
-    @JsonManagedReference
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinTable(name = "tbl_rel_users_roles",
@@ -60,7 +59,7 @@ public class User extends BaseEntity implements UserDetails, Principal {
     @Enumerated(EnumType.STRING)
     UserState userState;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Asset> assets;
 
     @Override

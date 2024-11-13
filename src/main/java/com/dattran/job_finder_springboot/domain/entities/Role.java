@@ -29,9 +29,9 @@ public class Role extends BaseEntity {
     @JsonIgnore
     String description;
 
-    @JsonBackReference
+    @JsonIgnore
     @ManyToMany(targetEntity = User.class,
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             mappedBy = "roles",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     List<User> users;

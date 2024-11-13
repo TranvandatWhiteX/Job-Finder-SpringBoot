@@ -44,7 +44,7 @@ public class Company {
             inverseJoinColumns = @JoinColumn(name = "business_id"))
     Set<BusinessStream> businessStreams;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Asset> assets;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)

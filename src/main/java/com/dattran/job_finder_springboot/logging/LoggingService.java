@@ -78,6 +78,4 @@ public class LoggingService {
                 .build();
         logEventRepository.save(logEvent);
     }
-
-
 }
