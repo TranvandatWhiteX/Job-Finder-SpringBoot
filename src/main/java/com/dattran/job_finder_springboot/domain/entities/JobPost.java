@@ -27,10 +27,10 @@ public class JobPost extends BaseEntity {
 
     Boolean isActive;
 
-    @Column(name = "job_requirement", columnDefinition = "TEXT NOT NULL")
+    @Column(name = "job_requirement", columnDefinition = "TEXT", nullable = false)
     String jobRequirement;
 
-    @Column(name = "job_description", columnDefinition = "TEXT NOT NULL")
+    @Column(name = "job_description", columnDefinition = "TEXT", nullable = false)
     String jobDescription;
 
     @Column(columnDefinition = "TEXT NOT NULL")

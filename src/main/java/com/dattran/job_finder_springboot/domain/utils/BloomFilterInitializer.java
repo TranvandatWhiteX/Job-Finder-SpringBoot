@@ -29,7 +29,7 @@ public class BloomFilterInitializer {
     @Autowired
     public BloomFilterInitializer(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.shape = Shape.fromNP(10000000, 0.01);
+        this.shape = Shape.fromNP(100000000, 0.001);
     }
 
     @PostConstruct

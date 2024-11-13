@@ -22,7 +22,7 @@ public class Company {
     @Column(name = "tax_identification_number")
     String taxIdentificationNumber;
 
-    @Column(columnDefinition = "TEXT NOT NULL")
+    @Column(columnDefinition = "TEXT", nullable = false)
     String description;
 
     @Column(name = "website_url")

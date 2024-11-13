@@ -1,0 +1,52 @@
+# Loại bỏ các tệp và thư mục build artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Loại bỏ thư mục của IDE (IntelliJ IDEA, Eclipse, v.v.)
+.idea/
+.vscode/
+*.iml
+
+# Loại bỏ các thư mục và tệp do công cụ xây dựng tạo ra
+.gradle/
+build/
+out/
+*.log
+*.tmp
+
+# Loại bỏ các tệp hệ thống (macOS, Windows)
+.DS_Store
+Thumbs.db
+
+# Loại bỏ các tệp tạm thời và bản sao lưu
+*.swp
+*~
+*.bak
+
+# Các thư mục liên quan đến Docker (Dockerfile, .dockerignore)
+Dockerfile*
+.dockerignore
+
+# Các tệp cấu hình hoặc dữ liệu không cần thiết (như tệp log, báo cáo test)
+logs/
+test-outputs/
+
+# Loại bỏ các tệp và thư mục dữ liệu cơ sở dữ liệu
+*.sql
+*.sqlite
+
+# Loại bỏ các tệp nén hoặc archive không cần thiết
+*.tar
+*.zip
+*.tar.gz
+*.rar
+
+# Loại bỏ các tệp cấu hình không cần thiết cho Spring Boot (tệp environment hoặc config cho các môi trường khác)
+application-dev.properties
+application-test.properties
+
+# Thư mục snapshot của redis
+redis-data

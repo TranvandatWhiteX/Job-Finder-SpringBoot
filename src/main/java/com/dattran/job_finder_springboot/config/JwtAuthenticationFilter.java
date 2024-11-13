@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,7 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull FilterChain filterChain) throws IOException {
         try {
             if (isBypass(request)) {
                 filterChain.doFilter(request, response);
@@ -65,21 +65,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isBypass(@NonNull HttpServletRequest request) {
-        final List<Pair<String, String>> bypassTokens = List.of(
-                Pair.of("/auth/login", "POST"),
-                Pair.of("/users", "POST"),
-                Pair.of("/users/verify", "POST"),
-                Pair.of("/users/forgot-password", "POST"),
-                Pair.of("/users/verify-pass", "POST")
+        Map<String, Set<String>> bypassTokens = Map.of(
+                "/auth/login", Set.of("POST"),
+                "/users", Set.of("POST"),
+                "/users/verify", Set.of("POST"),
+                "/users/forgot-password", Set.of("POST"),
+                "/users/verify-pass", Set.of("POST")
         );
         String requestPath = request.getServletPath();
         String requestMethod = request.getMethod();
-        for (Pair<String, String> bypassToken : bypassTokens) {
-            if (requestPath.equals(bypassToken.getFirst())
-                    && requestMethod.equals(bypassToken.getSecond())) {
-                return true;
-            }
-        }
-        return false;
+        return bypassTokens.containsKey(requestPath) && bypassTokens.get(requestPath).contains(requestMethod);
     }
 }
