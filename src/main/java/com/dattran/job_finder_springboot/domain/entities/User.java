@@ -59,12 +59,11 @@ public class User extends BaseEntity implements UserDetails, Principal {
     @Enumerated(EnumType.STRING)
     UserState userState;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<Asset> assets;
-
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     Address address;
+
+    String companyId;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

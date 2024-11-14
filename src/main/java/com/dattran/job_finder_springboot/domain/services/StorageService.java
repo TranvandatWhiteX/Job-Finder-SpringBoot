@@ -39,15 +39,11 @@ public class StorageService {
   @Value("${aws.expire-time}")
   Integer expireTime;
 
-  public UploadResponse generateUrl(UploadType type, String fileName, String userId) {
+  public UploadResponse generateUrl(UploadType type, String userId) {
     UUID uuid = UUID.randomUUID();
     LocalDateTime now = LocalDateTime.now();
     StringBuilder sb = new StringBuilder();
-    sb.append(now.format(DateTimeFormatter.ISO_DATE))
-        .append("_")
-        .append(uuid)
-        .append("_")
-        .append(fileName);
+    sb.append(now.format(DateTimeFormatter.ISO_DATE)).append("_").append(uuid);
     String urlUpload = generatePutPresignedUrl(sb.toString());
     String imageUrl =
         "https://"
@@ -73,13 +69,15 @@ public class StorageService {
             .type(type)
             .url(imageUrl)
             .userId(userId)
+            .isDeleted(false)
             .build();
     storageRepository.save(storage);
   }
 
   // Khi không bật ACL
-  private String createPresignedGetUrl(String bucketName, String key) {
-    GetObjectRequest objectRequest = GetObjectRequest.builder().bucket(bucketName).key(key).build();
+  private String createPresignedGetUrl(String key) {
+    GetObjectRequest objectRequest =
+        GetObjectRequest.builder().bucket(awsProperties.getS3BucketName()).key(key).build();
     GetObjectPresignRequest presignRequest =
         GetObjectPresignRequest.builder()
             .signatureDuration(Duration.ofMinutes(expireTime)) // The URL will expire in 30 minutes.

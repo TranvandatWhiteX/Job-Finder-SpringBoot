@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 public class LogException {
     Integer status;
     String message;
-    String messageCode;
     String description;
     String path;
     Object params;

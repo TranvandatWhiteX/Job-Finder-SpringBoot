@@ -23,6 +23,8 @@ public class BusinessStream extends BaseEntity {
 
     String description;
 
+    Long code;
+
     @ManyToMany(mappedBy = "businessStreams")
     Set<Company> companies;
 }

@@ -1,9 +1,12 @@
 package com.dattran.job_finder_springboot.domain.entities;
 
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,6 +21,9 @@ public class Company {
     String id;
 
     String name;
+
+    @Column(name = "international_name")
+    String internationalName;
 
     @Column(name = "tax_identification_number")
     String taxIdentificationNumber;
@@ -37,15 +43,20 @@ public class Company {
     @Column(name = "head_quarters")
     String headQuarters;
 
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
+    List<Address> addresses;
+
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
+    Asset asset;
+
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "tbl_rel_company_business",
             joinColumns = @JoinColumn(name = "company_id"),
             inverseJoinColumns = @JoinColumn(name = "business_id"))
-    Set<BusinessStream> businessStreams;
-
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<Asset> assets;
+    List<BusinessStream> businessStreams;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     Set<JobPost> jobPosts;

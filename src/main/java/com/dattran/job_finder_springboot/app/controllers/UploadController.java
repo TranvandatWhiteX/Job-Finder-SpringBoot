@@ -23,9 +23,8 @@ public class UploadController {
     @GetMapping("/generate-upload-url")
     public UploadResponse generateUploadUrl(
             @RequestHeader(name = JFHeader.headerUserId) String userId,
-            @RequestParam @Valid UploadType type,
-            @RequestParam @Valid String fileName
+            @RequestParam @Valid UploadType type
     ) {
-        return storageService.generateUrl(type, fileName, userId);
+        return storageService.generateUrl(type, userId);
     }
 }

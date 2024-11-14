@@ -65,7 +65,7 @@ public class RequestUtil {
           requestUrl = requestUrl.replace(pathVariable, entry.getValue());
         }
       }
-      if (!requestParams.isEmpty()) {
+      if (!requestParams.isEmpty() && requestBody != null) {
         List<String> keyAndVal =
             requestParams.entrySet().stream()
                 .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
@@ -89,6 +89,7 @@ public class RequestUtil {
       RestTemplate restTemplate = getTemplate();
       ResponseEntity<String> response =
           restTemplate.exchange(requestUrl, method, httpEntity, String.class);
+      // Todo: Log Calling API
       return new HttpResponse(response.getStatusCode(), response.getBody(), response.getHeaders());
     } catch (Exception e) {
       String msg = String.format("Cannot call api: %s, error: %s", requestUrl, e.getMessage());

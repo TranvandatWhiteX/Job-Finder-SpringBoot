@@ -6,6 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ResponseStatus {
+    BUSINESS_STREAM_NOT_FOUND(400, "Business Stream Not Found!"),
+    TAX_NOT_FOUND(400, "Tax Not Found!"),
+    INVALID_TAX(400, "Tax is null or tax already exist!"),
     JWT_ERROR(400, "Jwt Error!"),
     PASSWORD_NOT_MATCH(400, "Password Not Match!"),
     USER_ERROR(400, "Un-active User Or User Deleted!"),

@@ -62,9 +62,8 @@ otp:
   expiration: ${OTP_EXPIRATION_MINUTES}
 server:
   port: ${PORT}
-socketio:
-  port: ${SOCKET_IO_PORT:9092}
-  host: ${SOCKET_IO_HOST:0.0.0.0}
+app:
+  tax-api: ${TAX_API}
 springdoc:
   api-docs:
     path: /v3/api-docs

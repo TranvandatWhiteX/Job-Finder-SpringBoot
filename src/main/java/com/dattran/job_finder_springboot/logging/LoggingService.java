@@ -43,16 +43,13 @@ public class LoggingService {
 
     public void writeLogException(Integer status,
                               String message,
-                              String messageCode,
                               String description,
-                              String path,
                               HttpServletRequest request) {
         LogException logException = LogException.builder()
                 .status(status)
                 .message(message)
-                .messageCode(messageCode)
                 .description(description)
-                .path(path)
+                .path(request.getRequestURI())
                 .createdAt(LocalDateTime.now())
                 .headers(HttpRequestUtil.getHeaderMap(request))
                 .params(request.getParameterMap())

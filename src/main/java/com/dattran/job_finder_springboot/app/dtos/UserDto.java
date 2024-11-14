@@ -31,5 +31,7 @@ public class UserDto {
 
     Set<UserRole> roles;
 
+    String companyId;
+
     Address address;
 }

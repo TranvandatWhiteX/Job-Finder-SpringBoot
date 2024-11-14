@@ -5,11 +5,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -20,6 +18,8 @@ public class Storage {
 
     String userId;
 
+    String companyId;
+
     String bucket;
 
     UploadType type;
@@ -27,6 +27,8 @@ public class Storage {
     State state;
 
     LocalDateTime createdAt;
+
+    Boolean isDeleted;
 
     public enum State {
         PUBLIC,

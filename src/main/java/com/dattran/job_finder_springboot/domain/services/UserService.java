@@ -56,6 +56,9 @@ public class UserService {
                     .orElseThrow(() -> new AppException(ResponseStatus.ROLE_NOT_FOUND));
             roles.add(role);
         }
+        if (userDto.getCompanyId() != null && userDto.getRoles().contains(UserRole.RECRUITER)) {
+            user.setCompanyId(userDto.getCompanyId());
+        }
         user.setRoles(roles);
         // Create OTP
         String otp = otpService.generateOTP(6);

@@ -2,8 +2,10 @@ package com.dattran.job_finder_springboot.domain.entities;
 
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 
@@ -49,6 +51,10 @@ public class JobPost extends BaseEntity {
 
     @Column(name = "job_type")
     JobType jobType;
+
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
+    Address address;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
