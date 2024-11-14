@@ -1,5 +1,6 @@
 package com.dattran.job_finder_springboot.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,6 +26,7 @@ public class BusinessStream extends BaseEntity {
 
     Long code;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "businessStreams")
     Set<Company> companies;
 }

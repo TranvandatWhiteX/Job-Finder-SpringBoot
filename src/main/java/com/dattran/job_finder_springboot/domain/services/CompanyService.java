@@ -3,7 +3,6 @@ package com.dattran.job_finder_springboot.domain.services;
 import com.dattran.job_finder_springboot.app.dtos.CompanyDto;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
-import com.dattran.job_finder_springboot.domain.enums.BusinessType;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.BusinessStreamRepository;
@@ -67,6 +66,7 @@ public class CompanyService {
             MediaType.APPLICATION_JSON);
     Company company = FnCommon.copyNonNullProperties(Company.class, companyDto);
     assert company != null;
+    company.setTaxIdentificationNumber(companyDto.getTax());
     try {
       JsonNode jsonNode = objectMapper.readTree(response.getBody());
       JsonNode data = jsonNode.get("data");
@@ -76,13 +76,13 @@ public class CompanyService {
       JsonNode name = data.get("name");
       JsonNode internationalName = data.get("internationalName");
       JsonNode headQuarters = data.get("address");
-      if (!name.isEmpty()) {
+      if (!name.isNull()) {
         company.setName(name.asText());
       }
-      if (!internationalName.isEmpty()) {
+      if (!internationalName.isNull()) {
         company.setInternationalName(internationalName.asText());
       }
-      if (!headQuarters.isEmpty()) {
+      if (!headQuarters.isNull()) {
         company.setHeadQuarters(headQuarters.asText());
       }
     } catch (JsonProcessingException e) {
