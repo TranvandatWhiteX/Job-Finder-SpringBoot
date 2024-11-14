@@ -40,7 +40,7 @@ public class User extends BaseEntity implements UserDetails, Principal {
 
     String email;
 
-    @ManyToMany(targetEntity = Role.class, fetch = FetchType.LAZY,
+    @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinTable(name = "tbl_rel_users_roles",
             joinColumns = @JoinColumn(name = "user_id"),

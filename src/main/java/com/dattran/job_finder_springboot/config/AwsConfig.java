@@ -9,6 +9,8 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
 @RequiredArgsConstructor
@@ -25,5 +27,20 @@ public class AwsConfig {
         .region(Region.of(awsProperties.getRegion()))
         .credentialsProvider(StaticCredentialsProvider.create(awsCredsAwsBasicCredentials))
         .build();
+  }
+
+  @Bean
+  public S3Presigner s3Presigner() {
+    S3Configuration s3Config = S3Configuration.builder()
+            .checksumValidationEnabled(true)  // Optional: Enable checksum validation
+            .build();
+    AwsBasicCredentials awsCredsAwsBasicCredentials =
+            AwsBasicCredentials.create(
+                    awsProperties.getAccessKeyId(), awsProperties.getSecretAccessKey());
+    return S3Presigner.builder()
+            .region(Region.of(awsProperties.getRegion()))
+            .credentialsProvider(StaticCredentialsProvider.create(awsCredsAwsBasicCredentials))
+            .serviceConfiguration(s3Config)
+            .build();
   }
 }
