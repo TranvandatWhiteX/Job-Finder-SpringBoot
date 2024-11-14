@@ -13,13 +13,11 @@ import com.dattran.job_finder_springboot.domain.repositories.RoleRepository;
 import com.dattran.job_finder_springboot.domain.repositories.UserRepository;
 import com.dattran.job_finder_springboot.domain.utils.FnCommon;
 import com.dattran.job_finder_springboot.domain.utils.HttpRequestUtil;
-import com.dattran.job_finder_springboot.domain.utils.JsonParser;
 import com.dattran.job_finder_springboot.logging.LoggingService;
 import com.dattran.job_finder_springboot.logging.entities.LogAction;
 import com.dattran.job_finder_springboot.logging.entities.ObjectName;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dattran.job_finder_springboot.logging.entities.UserLog;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.websocket.OnClose;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -61,7 +59,6 @@ public class UserService {
         user.setRoles(roles);
         // Create OTP
         String otp = otpService.generateOTP(6);
-        log.info("User OTP: "+otp);
         User savedUser = userRepository.save(user);
         otpService.storeOtp(savedUser.getId(), otp);
         // Add Email To BloomFilter
@@ -75,8 +72,16 @@ public class UserService {
                 "OTP Verification",
                 "send-otp.html",
                 variables);
-        loggingService.writeLogEvent(savedUser.getId(), LogAction.CREATE, HttpRequestUtil.getClientIp(httpServletRequest), ObjectName.USER.name(), null, JsonParser.objectToMap(savedUser));
+        // Logging
+        UserLog userLog = FnCommon.copyNonNullProperties(UserLog.class, savedUser);
+        assert userLog != null;
+        userLog.setRoles(getRoles(savedUser.getRoles()));
+        loggingService.writeLogEvent(savedUser.getId(), LogAction.CREATE, HttpRequestUtil.getClientIp(httpServletRequest), ObjectName.USER.name(), null, userLog);
         return savedUser;
+    }
+
+    private List<String> getRoles(List<Role> roles) {
+        return roles.stream().map(Role::getName).toList();
     }
 
     public VerifyResponse verifyUser(VerifyDto verifyDto) {

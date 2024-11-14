@@ -11,4 +11,5 @@ public class Address {
     String district;
     String ward;
     String detail;
+    Long provinceCode;
 }

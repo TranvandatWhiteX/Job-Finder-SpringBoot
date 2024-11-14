@@ -33,7 +33,7 @@ public class JobPost extends BaseEntity {
     @Column(name = "job_description", columnDefinition = "TEXT", nullable = false)
     String jobDescription;
 
-    @Column(columnDefinition = "TEXT NOT NULL")
+    @Column(columnDefinition = "TEXT")
     String responsibilities;
 
     @Column(name = "logo_url")

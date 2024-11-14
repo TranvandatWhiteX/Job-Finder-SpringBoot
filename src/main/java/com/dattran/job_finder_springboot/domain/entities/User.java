@@ -1,13 +1,13 @@
 package com.dattran.job_finder_springboot.domain.entities;
 
-import com.dattran.job_finder_springboot.domain.converters.AddressAttributeConverter;
 import com.dattran.job_finder_springboot.domain.enums.UserState;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +40,7 @@ public class User extends BaseEntity implements UserDetails, Principal {
 
     String email;
 
-    @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER,
+    @ManyToMany(targetEntity = Role.class, fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinTable(name = "tbl_rel_users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -62,7 +62,7 @@ public class User extends BaseEntity implements UserDetails, Principal {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<Asset> assets;
 
-    @Convert(converter = AddressAttributeConverter.class)
+    @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     Address address;
 
