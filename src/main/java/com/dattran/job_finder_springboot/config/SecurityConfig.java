@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    String[] PUBLIC_ENDPOINTS = {
+    String[] PUBLIC_ENDPOINTS_POST = {
             "/users",
             "/users/verify",
             "/users/forgot-password",
@@ -33,11 +33,26 @@ public class SecurityConfig {
             "/auth/login"
     };
 
+    String[] PUBLIC_ENDPOINTS_GET = {
+//            Swagger
+            "/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/webjars/swagger-ui/**",
+            "/swagger-ui/index.html",
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth-> auth
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS_POST).permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET).permitAll()
                         .anyRequest().authenticated());
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable);

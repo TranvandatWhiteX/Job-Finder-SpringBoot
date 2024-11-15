@@ -15,9 +15,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +30,7 @@ import java.util.Set;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtService jwtService;
     UserDetailsService userDetailsService;
+    private static final PathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -64,16 +68,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isBypass(@NonNull HttpServletRequest request) {
-        Map<String, Set<String>> bypassTokens = Map.of(
-                "/auth/login", Set.of("POST"),
-                "/users", Set.of("POST"),
-                "/users/verify", Set.of("POST"),
-                "/users/forgot-password", Set.of("POST"),
-                "/users/verify-pass", Set.of("POST")
-        );
+    private boolean isBypass(HttpServletRequest request) {
+        Map<String, Set<String>> bypassTokens = new HashMap<>();
+        bypassTokens.put("/auth/login", Set.of("POST"));
+        bypassTokens.put("/users", Set.of("POST"));
+        bypassTokens.put("/users/verify", Set.of("POST"));
+        bypassTokens.put("/users/forgot-password", Set.of("POST"));
+        bypassTokens.put("/users/verify-pass", Set.of("POST"));
+        bypassTokens.put("/api-docs", Set.of("GET"));
+        bypassTokens.put("/v3/api-docs/**", Set.of("GET"));
+        bypassTokens.put("/swagger-resources", Set.of("GET"));
+        bypassTokens.put("/swagger-resources/**", Set.of("GET"));
+        bypassTokens.put("/configuration/ui", Set.of("GET"));
+        bypassTokens.put("/configuration/security", Set.of("GET"));
+        bypassTokens.put("/swagger-ui/**", Set.of("GET"));
+        bypassTokens.put("/swagger-ui.html", Set.of("GET"));
+        bypassTokens.put("/webjars/swagger-ui/**", Set.of("GET"));
+        bypassTokens.put("/swagger-ui/index.html", Set.of("GET"));
         String requestPath = request.getServletPath();
         String requestMethod = request.getMethod();
-        return bypassTokens.containsKey(requestPath) && bypassTokens.get(requestPath).contains(requestMethod);
+        for (Map.Entry<String, Set<String>> entry : bypassTokens.entrySet()) {
+            String pathPattern = entry.getKey();
+            Set<String> methods = entry.getValue();
+            if (pathMatcher.match(pathPattern, requestPath) && methods.contains(requestMethod)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
