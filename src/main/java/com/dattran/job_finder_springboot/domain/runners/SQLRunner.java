@@ -17,13 +17,45 @@ import java.nio.file.Files;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SQLRunner implements CommandLineRunner {
+    private static final String CHECK_SCHEMA_VN = "SELECT EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'vn');";
+    private static final String CHECK_TABLE_EXISTS = "SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'vn' AND table_name = ?);";
+    private static final String CHECK_TABLE_EMPTY = "SELECT NOT EXISTS (SELECT 1 FROM vn.%s LIMIT 1);";
+
     JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) throws Exception {
-        // Todo: Run only once time
-//        executeSQLFile("./sql/CreateTables_vn_units.sql");
-//        executeSQLFile("./sql/ImportData_vn_units.sql");
+        if (!checkSchemaExists()) {
+            executeSQLFile("./sql/CreateTables_vn_units.sql");
+        }
+        if (allTablesExist() && allTablesEmpty()) {
+            executeSQLFile("./sql/ImportData_vn_units.sql");
+        }
+    }
+
+    private boolean checkSchemaExists() {
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_SCHEMA_VN, Boolean.class));
+    }
+
+    private boolean allTablesEmpty() {
+        String[] tables = {"administrative_regions", "administrative_units", "districts", "provinces", "wards"};
+        for (String table : tables) {
+            String query = String.format(CHECK_TABLE_EMPTY, table);
+            if (!Boolean.TRUE.equals(jdbcTemplate.queryForObject(query, Boolean.class))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean allTablesExist() {
+        String[] tables = {"administrative_regions", "administrative_units", "districts", "provinces", "wards"};
+        for (String table : tables) {
+            if (!Boolean.TRUE.equals(jdbcTemplate.queryForObject(CHECK_TABLE_EXISTS, Boolean.class, table))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void executeSQLFile(String filePath) throws IOException {
@@ -31,9 +63,10 @@ public class SQLRunner implements CommandLineRunner {
         if (resource.exists()) {
             String sql = new String(Files.readAllBytes(resource.getFile().toPath()));
             jdbcTemplate.execute(sql);
-            System.out.println("Executed SQL file: " + filePath);
+            log.info("Executed SQL file: {}", filePath);
         } else {
-            System.err.println("File not found: " + filePath);
+            log.error("File not found: {}", filePath);
         }
     }
 }
+

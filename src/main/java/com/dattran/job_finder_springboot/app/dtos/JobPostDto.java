@@ -1,6 +1,7 @@
 package com.dattran.job_finder_springboot.app.dtos;
 
 import com.dattran.job_finder_springboot.domain.entities.Address;
+import com.dattran.job_finder_springboot.domain.entities.Salary;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
 import jakarta.validation.constraints.AssertTrue;
@@ -45,6 +46,16 @@ public class JobPostDto {
 
     @Size(min = 1, message = "Skill codes must not be null")
     List<Long> skillCodes;
+
+    @NotNull(message = "Salary must not be null")
+    Salary salary;
+
+    @NotNull(message = "Number requirement must not be null")
+    Long numberRequirement;
+
+    //    Todo: Experience = 0 => Not Required, Experience = 0.5 => Under 1 year, = 1 => 1 year,....
+    @NotNull(message = "Experience must not be null")
+    Long experience;
 
     @AssertTrue(message = "Expired date must be at least 14 days from today!")
     public boolean isExpiredDateValid() {

@@ -3,8 +3,6 @@ package com.dattran.job_finder_springboot.domain.entities;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.hypersistence.utils.hibernate.type.array.ListArrayType;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -54,6 +52,15 @@ public class JobPost extends BaseEntity {
     @Type(JsonBinaryType.class)
     @Column(name = "job_types", columnDefinition = "jsonb")
     List<JobType> jobTypes;
+
+    @Type(JsonBinaryType.class)
+    @Column(name = "salary", columnDefinition = "jsonb")
+    Salary salary;
+
+    @Column(name = "number_requirement")
+    Long numberRequirement;
+
+    Long experience;
 
     @ManyToMany(targetEntity = JobSkill.class, fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})

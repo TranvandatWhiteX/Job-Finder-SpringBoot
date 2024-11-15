@@ -1,7 +1,6 @@
 package com.dattran.job_finder_springboot.app.controllers;
 
 import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
-import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
 import com.dattran.job_finder_springboot.domain.services.JobPostService;
 import com.dattran.job_finder_springboot.domain.utils.ApiResponse;
@@ -24,7 +23,7 @@ public class JobPostController {
     JobPostService jobPostService;
 
     @PostMapping
-//    @PreAuthorize("hasRole('RECRUITER')")
+    @PreAuthorize("hasRole('RECRUITER')")
     public ApiResponse<JobPost> postJob(@RequestBody @Valid JobPostDto jobPostDto, HttpServletRequest httpServletRequest) {
         JobPost jobPost = jobPostService.postJob(jobPostDto, httpServletRequest);
         return ApiResponse.<JobPost>builder()
