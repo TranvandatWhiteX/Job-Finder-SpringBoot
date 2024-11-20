@@ -2,10 +2,12 @@ package com.dattran.job_finder_springboot.app.dtos;
 
 import com.dattran.job_finder_springboot.domain.entities.Address;
 import com.dattran.job_finder_springboot.domain.entities.Salary;
+import com.dattran.job_finder_springboot.domain.enums.BusinessType;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -56,6 +58,10 @@ public class JobPostDto {
     //    Todo: Experience = 0 => Not Required, Experience = 0.5 => Under 1 year, = 1 => 1 year,....
     @NotNull(message = "Experience must not be null")
     Long experience;
+
+    @NotNull(message = "Business code must not be null")
+    @Positive(message = "Business code must greater than 0")
+    Long businessCode;
 
     @AssertTrue(message = "Expired date must be at least 14 days from today!")
     public boolean isExpiredDateValid() {

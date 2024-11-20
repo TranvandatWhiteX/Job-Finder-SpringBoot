@@ -1,5 +1,6 @@
 package com.dattran.job_finder_springboot.domain.entities;
 
+import com.fasterxml.jackson.annotation.*;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,11 +8,11 @@ import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "tbl_companies")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,13 +52,14 @@ public class Company {
     @Column(columnDefinition = "jsonb")
     Asset asset;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "tbl_rel_company_business",
             joinColumns = @JoinColumn(name = "company_id"),
             inverseJoinColumns = @JoinColumn(name = "business_id"))
     List<BusinessStream> businessStreams;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    Set<JobPost> jobPosts;
+    @JsonIgnore
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<JobPost> jobPosts;
 }

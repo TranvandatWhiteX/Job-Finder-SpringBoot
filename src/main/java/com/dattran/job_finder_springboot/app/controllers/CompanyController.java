@@ -27,7 +27,7 @@ public class CompanyController {
     CompanyService companyService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRATION')")
+//    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ApiResponse<Company> addCompany(@RequestBody @Valid CompanyDto companyDto,
                                            HttpServletRequest httpServletRequest) {
         Company company = companyService.addCompany(companyDto, httpServletRequest);

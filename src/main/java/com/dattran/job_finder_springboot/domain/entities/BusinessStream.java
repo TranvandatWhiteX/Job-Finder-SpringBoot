@@ -1,10 +1,11 @@
 package com.dattran.job_finder_springboot.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
@@ -27,6 +28,10 @@ public class BusinessStream extends BaseEntity {
     Long code;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "businessStreams")
-    Set<Company> companies;
+    @ManyToMany(mappedBy = "businessStreams", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    List<Company> companies;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "businessStream", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<JobPost> jobPosts;
 }

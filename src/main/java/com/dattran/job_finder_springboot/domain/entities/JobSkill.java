@@ -8,7 +8,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "tbl_job_skills")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
