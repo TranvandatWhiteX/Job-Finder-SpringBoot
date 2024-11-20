@@ -28,3 +28,7 @@
   ![](images/S3-Setup-1.PNG)
   ![](images/S3-Setup-2.PNG)
   ![](images/S3-Setup-3.PNG)
+
+## Lưu ý khi sử dụng @Data 
+- Vì phương thức toString() có thể gây ra lỗi StackOverFlow khi các entity có các quan hệ @ManyToMany, @OneToMany,.... 
+- Sử dụng @Getter, @Setter thay cho @Data.
