@@ -1,5 +1,6 @@
 package com.dattran.job_finder_springboot.app.controllers;
 
+import com.dattran.job_finder_springboot.app.dtos.ChangePassDto;
 import com.dattran.job_finder_springboot.app.dtos.UserDto;
 import com.dattran.job_finder_springboot.app.dtos.VerifyDto;
 import com.dattran.job_finder_springboot.app.responses.VerifyResponse;
@@ -13,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -43,8 +41,9 @@ public class UserController {
 
     @PostMapping("/verify")
     public ApiResponse<Void> verifyUser(@RequestBody @Valid VerifyDto verifyDto,
+                                        @RequestParam("ivu") Boolean isVerifyUser,
                                         HttpServletRequest httpServletRequest) {
-        VerifyResponse verified = userService.verifyUser(verifyDto);
+        VerifyResponse verified = userService.verifyUser(verifyDto, isVerifyUser);
         return ApiResponse.<Void>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
@@ -54,13 +53,40 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/change-password")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public ApiResponse<Void> changePassword(HttpServletRequest httpServletRequest) {
+    @PostMapping("/change-password/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
+    public ApiResponse<Void> changePassword(@RequestHeader("Authorization") String token,
+                                            @PathVariable String id,
+                                            @RequestBody @Valid ChangePassDto changePassDto,
+                                            HttpServletRequest httpServletRequest) {
+        userService.changePassword(token, id, changePassDto);
         return ApiResponse.<Void>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
                 .requestMethod(httpServletRequest.getMethod())
                 .build();
     }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
+    public ApiResponse<User> getUserById(@RequestHeader("Authorization") String token,
+                                         @PathVariable String id, HttpServletRequest httpServletRequest) {
+        User user = userService.getUserById(id, token);
+        return ApiResponse.<User>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .result(user)
+                .status(HttpStatus.CREATED)
+                .message("Get User Successfully!")
+                .build();
+    }
+
+    // Todo: Get All Users
+
+    // Todo: Filter User By .....
+
+    // Todo: Update User
+
+    // Todo: Delete User
 }

@@ -1,5 +1,6 @@
 package com.dattran.job_finder_springboot.domain.services;
 
+import com.dattran.job_finder_springboot.app.dtos.ChangePassDto;
 import com.dattran.job_finder_springboot.app.dtos.UserDto;
 import com.dattran.job_finder_springboot.app.dtos.VerifyDto;
 import com.dattran.job_finder_springboot.app.responses.VerifyResponse;
@@ -17,6 +18,7 @@ import com.dattran.job_finder_springboot.logging.LoggingService;
 import com.dattran.job_finder_springboot.logging.entities.LogAction;
 import com.dattran.job_finder_springboot.logging.entities.ObjectName;
 import com.dattran.job_finder_springboot.logging.entities.UserLog;
+import com.nimbusds.jwt.JWTClaimsSet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class UserService {
     BloomFilterService bloomFilterService;
     EmailService emailService;
     LoggingService loggingService;
+    JwtService jwtService;
 
     public User createUser(UserDto userDto, HttpServletRequest httpServletRequest)  {
         boolean isEmailExisted = bloomFilterService.isEmailExisted(userDto.getEmail());
@@ -50,13 +53,14 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setUserState(UserState.PENDING);
         List<Role> roles = new ArrayList<>();
-        for (UserRole userRole : userDto.getRoles()) {
+        for (Long roleCode : userDto.getRoleCodes()) {
             Role role = roleRepository
-                    .findByName(userRole.name())
+                    .findByCode(roleCode)
                     .orElseThrow(() -> new AppException(ResponseStatus.ROLE_NOT_FOUND));
             roles.add(role);
         }
-        if (userDto.getCompanyId() != null && userDto.getRoles().contains(UserRole.RECRUITER)) {
+        // RECRUITER CODE: 1103L
+        if (userDto.getCompanyId() != null && userDto.getRoleCodes().contains(1103L)) {
             user.setCompanyId(userDto.getCompanyId());
         }
         user.setRoles(roles);
@@ -87,20 +91,33 @@ public class UserService {
         return roles.stream().map(Role::getName).toList();
     }
 
-    public VerifyResponse verifyUser(VerifyDto verifyDto) {
-        User user = userRepository
-                .findById(verifyDto.getUserId())
-                .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
-        if (otpService.validateOtp(user.getId(), verifyDto.getOtp())) {
-            user.setUserState(UserState.ACTIVE);
-            user.setIsActive(true);
-            userRepository.save(user);
-            return VerifyResponse.builder()
-                    .isVerified(true)
-                    .message("OTP verified")
-                    .build();
+    public VerifyResponse verifyUser(VerifyDto verifyDto, Boolean isVerifyUser) {
+        User user = getUserById(verifyDto.getUserId());
+        if (isVerifyUser) {
+            if (otpService.validateOtp(user.getId(), verifyDto.getOtp())) {
+                user.setUserState(UserState.ACTIVE);
+                user.setIsActive(true);
+                userRepository.save(user);
+                return VerifyResponse.builder()
+                        .isVerified(true)
+                        .message("OTP verified")
+                        .build();
+            } else {
+                return handleVerifyFailed(verifyDto, user, user.getId());
+            }
         } else {
-            return handleVerifyFailed(verifyDto, user, user.getId());
+            if (otpService.validateOtp(user.getId(), verifyDto.getOtp())) {
+                String tempPass = user.getTempPassword();
+                user.setPassword(tempPass);
+                user.setTempPassword(null);
+                userRepository.save(user);
+                return VerifyResponse.builder()
+                        .isVerified(true)
+                        .message("OTP verified")
+                        .build();
+            } else {
+                return handleVerifyFailed(verifyDto, user, user.getId());
+            }
         }
     }
 
@@ -123,5 +140,45 @@ public class UserService {
                 .isVerified(false)
                 .message("OTP is expired! New OTP was sent to your email!")
                 .build();
+    }
+
+    public User getUserById(String id, String token) {
+        final String auth = token.substring(7);
+        JWTClaimsSet claims = jwtService.getAllClaimsFromToken(auth);
+        String email = (String) claims.getClaim("email");
+        User user = getUserById(id);
+        if (!user.getEmail().equals(email)) {
+            throw new AppException(ResponseStatus.FORBIDDEN);
+        }
+        return user;
+    }
+
+    public void changePassword(String token, String id, ChangePassDto changePassDto) {
+        User user = getUserById(id, token);
+        boolean isMatch = passwordEncoder.matches(changePassDto.getOldPass(), user.getPassword());
+        if (!isMatch) {
+            throw new AppException(ResponseStatus.PASSWORD_NOT_MATCH);
+        }
+        String newPassword = passwordEncoder.encode(changePassDto.getNewPass());
+        user.setTempPassword(newPassword);
+        // Create OTP
+        String otp = otpService.generateOTP(6);
+        User savedUser = userRepository.save(user);
+        otpService.storeOtp(savedUser.getId(), otp);
+        // Send Mail
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("otp", otp);
+        variables.put("username", savedUser.getFullName());
+        emailService.sendEmail(
+                savedUser.getEmail(),
+                "OTP Verification",
+                "send-otp.html",
+                variables);
+    }
+
+    private User getUserById(String id) {
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
     }
 }

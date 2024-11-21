@@ -2,7 +2,6 @@ package com.dattran.job_finder_springboot.app.controllers;
 
 import com.dattran.job_finder_springboot.app.dtos.CompanyDto;
 import com.dattran.job_finder_springboot.domain.entities.Company;
-import com.dattran.job_finder_springboot.domain.entities.User;
 import com.dattran.job_finder_springboot.domain.services.CompanyService;
 import com.dattran.job_finder_springboot.domain.utils.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +26,7 @@ public class CompanyController {
     CompanyService companyService;
 
     @PostMapping
-//    @PreAuthorize("hasRole('ADMINISTRATION')")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ApiResponse<Company> addCompany(@RequestBody @Valid CompanyDto companyDto,
                                            HttpServletRequest httpServletRequest) {
         Company company = companyService.addCompany(companyDto, httpServletRequest);
@@ -40,4 +39,14 @@ public class CompanyController {
                 .message("Company Created Successfully!")
                 .build();
     }
+
+    // Todo: Get All Companies
+
+    // Todo: Get Company By Id
+
+    // Todo: Filter Company
+
+    // Todo: Update Company
+
+    // Todo: Delete Company
 }

@@ -24,14 +24,17 @@ public class RoleRunner implements CommandLineRunner {
             List<Role> roles = List.of(
                     Role.builder()
                             .name("USER")
+                            .code(1101L)
                             .description("This is role for users. User can view jobs, apply jobs,...")
                             .build(),
                     Role.builder()
                             .name("ADMINISTRATOR")
+                            .code(1102L)
                             .description("This is role for administrators. Admin can manage users, jobs,...")
                             .build(),
                     Role.builder()
                             .name("RECRUITER")
+                            .code(1103L)
                             .description("This is role for recruiters. Recruiter can manage post jobs, review CVs,...")
                             .build()
             );

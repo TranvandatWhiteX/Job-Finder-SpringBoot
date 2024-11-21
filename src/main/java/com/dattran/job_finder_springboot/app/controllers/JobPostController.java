@@ -23,7 +23,7 @@ public class JobPostController {
     JobPostService jobPostService;
 
     @PostMapping
-//    @PreAuthorize("hasRole('RECRUITER')")
+    @PreAuthorize("hasRole('RECRUITER')")
     public ApiResponse<JobPost> postJob(@RequestBody @Valid JobPostDto jobPostDto, HttpServletRequest httpServletRequest) {
         JobPost jobPost = jobPostService.postJob(jobPostDto, httpServletRequest);
         return ApiResponse.<JobPost>builder()
@@ -35,4 +35,12 @@ public class JobPostController {
                 .message("Job Created Successfully!")
                 .build();
     }
+
+    // Todo: Filter Job
+
+    // Todo: Update Job
+
+    // Todo: Delete Job
+
+    // Todo: Get By Id
 }

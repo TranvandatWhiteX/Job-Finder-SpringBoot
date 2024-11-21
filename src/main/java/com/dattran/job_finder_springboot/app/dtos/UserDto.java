@@ -1,7 +1,7 @@
 package com.dattran.job_finder_springboot.app.dtos;
 
 import com.dattran.job_finder_springboot.domain.entities.Address;
-import com.dattran.job_finder_springboot.domain.enums.UserRole;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -29,9 +29,14 @@ public class UserDto {
     @NotNull(message = "Date of birth must not be null")
     LocalDate dateOfBirth;
 
-    Set<UserRole> roles;
+    Set<Long> roleCodes;
 
     String companyId;
 
     Address address;
+
+    @AssertTrue(message = "Recruiter must have company id!")
+    public boolean isRecruiter() {
+        return roleCodes.contains(1103L) && companyId.isEmpty();
+    }
 }

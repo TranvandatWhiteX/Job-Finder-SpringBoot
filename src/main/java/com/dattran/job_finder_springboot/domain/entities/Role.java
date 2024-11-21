@@ -22,6 +22,8 @@ public class Role extends BaseEntity {
 
     String name;
 
+    Long code;
+
     @JsonIgnore
     String description;
 

@@ -37,18 +37,20 @@ public class AuthenticationController {
                 .message("Login Successfully!")
                 .build();
     }
-
+    // Todo: Logout
     @PostMapping("/logout")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ApiResponse<LoginResponse> logout(HttpServletRequest httpServletRequest) {
         return null;
     }
 
+    // Todo: Forgot Password
     @PostMapping("/forgot-password")
     public ApiResponse<LoginResponse> forgotPassword(HttpServletRequest httpServletRequest) {
         return null;
     }
 
+    // Todo: Refresh Token
     @PostMapping("/refresh-token")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ApiResponse<LoginResponse> refreshToken(HttpServletRequest httpServletRequest) {
