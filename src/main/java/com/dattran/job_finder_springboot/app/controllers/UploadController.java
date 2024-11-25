@@ -27,4 +27,6 @@ public class UploadController {
     ) {
         return storageService.generateUrl(type, userId);
     }
+
+    // Todo: Delete Request
 }

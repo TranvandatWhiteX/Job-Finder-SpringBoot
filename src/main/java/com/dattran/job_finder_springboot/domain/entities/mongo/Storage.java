@@ -20,6 +20,8 @@ public class Storage {
 
     String companyId;
 
+    String fileName;
+
     String bucket;
 
     UploadType type;

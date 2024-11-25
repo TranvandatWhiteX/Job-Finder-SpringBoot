@@ -10,21 +10,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+import java.awt.print.Pageable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -34,6 +37,7 @@ public class StorageService {
   AwsProperties awsProperties;
   StorageRepository storageRepository;
   S3Presigner s3Presigner;
+  S3Client s3Client;
 
   @NonFinal
   @Value("${aws.expire-time}")
@@ -52,7 +56,7 @@ public class StorageService {
             + awsProperties.getRegion()
             + ".amazonaws.com/"
             + sb;
-    saveLog(awsProperties.getS3BucketName(), type, imageUrl, userId);
+    saveLog(awsProperties.getS3BucketName(), type, imageUrl, userId, sb.toString());
     return UploadResponse.builder()
         .imageUrl(imageUrl)
         .uploadUrl(urlUpload)
@@ -60,7 +64,25 @@ public class StorageService {
         .build();
   }
 
-  private void saveLog(String bucket, UploadType type, String imageUrl, String userId) {
+  public void deleteMultipleObjectFromBucket(String bucketName, List<ObjectIdentifier> keys) {
+    Delete del = Delete.builder()
+            .objects(keys)
+            .build();
+    try {
+      DeleteObjectsRequest multiObjectDeleteRequest = DeleteObjectsRequest.builder()
+              .bucket(bucketName)
+              .delete(del)
+              .build();
+      s3Client.deleteObjects(multiObjectDeleteRequest);
+      log.info("Multiple objects are deleted!");
+    } catch (S3Exception e) {
+      log.error(e.awsErrorDetails().errorMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void saveLog(
+      String bucket, UploadType type, String imageUrl, String userId, String fileName) {
     Storage storage =
         Storage.builder()
             .bucket(bucket)
@@ -68,6 +90,7 @@ public class StorageService {
             .createdAt(LocalDateTime.now())
             .type(type)
             .url(imageUrl)
+            .fileName(fileName)
             .userId(userId)
             .isDeleted(false)
             .build();
