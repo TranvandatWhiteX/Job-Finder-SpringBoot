@@ -72,3 +72,7 @@ springdoc:
     operationsSorter: alpha
     tagsSorter: alpha
     display-request-duration: true
+elasticsearch:
+  host: ${ELASTICSEARCH_HOST}
+  port: ${ELASTICSEARCH_PORT}
+  scheme: ${ELASTICSEARCH_SCHEME}

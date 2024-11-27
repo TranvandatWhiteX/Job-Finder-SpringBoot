@@ -1,6 +1,7 @@
 package com.dattran.job_finder_springboot.domain.services;
 
 import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
+import com.dattran.job_finder_springboot.app.dtos.JobSearchDto;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
@@ -23,6 +24,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -93,5 +96,9 @@ public class JobPostService {
         null,
         savedJobPost);
     return savedJobPost;
+  }
+
+  public Page<JobPost> searchJob(JobSearchDto jobSearchDto, Pageable pageable) {
+    return null;
   }
 }

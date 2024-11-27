@@ -1,6 +1,7 @@
 package com.dattran.job_finder_springboot.app.controllers;
 
 import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
+import com.dattran.job_finder_springboot.app.dtos.JobSearchDto;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
 import com.dattran.job_finder_springboot.domain.services.JobPostService;
 import com.dattran.job_finder_springboot.domain.utils.ApiResponse;
@@ -9,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +39,20 @@ public class JobPostController {
                 .build();
     }
 
-    // Todo: Filter Job
-
+    @GetMapping("/search")
+    public ApiResponse<Page<JobPost>> searchJob(@ModelAttribute @Valid JobSearchDto jobSearchDto,
+                                                Pageable pageable,
+                                                HttpServletRequest httpServletRequest) {
+        Page<JobPost> jobPosts = jobPostService.searchJob(jobSearchDto, pageable);
+        return ApiResponse.<Page<JobPost>>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .result(jobPosts)
+                .status(HttpStatus.OK)
+                .message("Search Jobs Successfully!")
+                .build();
+    }
     // Todo: Update Job
 
     // Todo: Delete Job

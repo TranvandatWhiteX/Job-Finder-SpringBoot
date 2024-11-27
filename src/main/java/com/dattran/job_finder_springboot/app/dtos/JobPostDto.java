@@ -2,7 +2,6 @@ package com.dattran.job_finder_springboot.app.dtos;
 
 import com.dattran.job_finder_springboot.domain.entities.Address;
 import com.dattran.job_finder_springboot.domain.entities.Salary;
-import com.dattran.job_finder_springboot.domain.enums.BusinessType;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
 import jakarta.validation.constraints.AssertTrue;

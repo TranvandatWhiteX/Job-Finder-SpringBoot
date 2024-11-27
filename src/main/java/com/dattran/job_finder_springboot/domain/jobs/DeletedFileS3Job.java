@@ -59,11 +59,11 @@ public class DeletedFileS3Job {
   // Run every 5s
   @Scheduled(fixedRate = 5000)
   public void runTaskEvery5Seconds() {
-    log.info("Schedule run task every 5 seconds");
+//    log.info("Schedule run task every 5 seconds");
   }
 
   @Scheduled(fixedDelay = 5000)
   public void runTaskAfter5SecondsDelay() {
-    System.out.println("Chạy sau mỗi 5 giây kể từ khi tác vụ trước kết thúc");
+//    System.out.println("Chạy sau mỗi 5 giây kể từ khi tác vụ trước kết thúc");
   }
 }

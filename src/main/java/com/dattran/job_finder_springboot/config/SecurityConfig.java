@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Set;
+
 @Configuration
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,6 +47,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/webjars/swagger-ui/**",
             "/swagger-ui/index.html",
+            "/jobs/search"
     };
 
     @Bean

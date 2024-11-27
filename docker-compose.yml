@@ -26,51 +26,51 @@ services:
     networks:
       - job-finder-net
 
-#  elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
-#    container_name: elasticseach-container
-#    environment:
-#      - bootstrap.memory_lock=true
-#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#      - "discovery.type=single-node"
-#      - xpack.security.enabled=false
-#    ports:
-#      - "9200:9200"
-#    volumes:
-#      - elasticsearch_data:/usr/share/elasticsearch/data
-#    networks:
-#      - job-finder-net
-#
-#  kibana:
-#    image: docker.elastic.co/kibana/kibana:8.9.0
-#    container_name: kibana-container
-#    ports:
-#      - "5601:5601"
-#    environment:
-#      ELASTICSEARCH_URL: http://elasticsearch:9200
-#      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
-#    depends_on:
-#      - elasticsearch
-#    networks:
-#      - job-finder-net
-#
-#  logstash:
-#    image: docker.elastic.co/logstash/logstash:8.9.0
-#    container_name: logstash-container
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    container_name: elasticseach-container
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - job-finder-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.9.0
+    container_name: kibana-container
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+    depends_on:
+      - elasticsearch
+    networks:
+      - job-finder-net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.9.0
+    container_name: logstash-container
 #    volumes:
 #      - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
 #      - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
-#    ports:
-#      - "5044:5044"
-#      - "5000:5000/tcp"
-#      - "5000:5000/udp"
-#      - "9600:9600"
-#    environment:
-#      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-#    networks:
-#      - job-finder-net
-#    depends_on:
-#      - elasticsearch
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - job-finder-net
+    depends_on:
+      - elasticsearch
 
   mail-dev:
     container_name: mail-dev-container
@@ -97,5 +97,5 @@ networks:
 volumes:
   postgres:
   mongo:
-#  elasticsearch_data:
-#    driver: local
+  elasticsearch_data:
+    driver: local
