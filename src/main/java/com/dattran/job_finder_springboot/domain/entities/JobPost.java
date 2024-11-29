@@ -46,13 +46,11 @@ public class JobPost extends BaseEntity {
 
     String location;
 
-    @Type(JsonBinaryType.class)
-    @Column(name = "job_levels", columnDefinition = "jsonb")
-    List<JobLevel> jobLevels;
+    @Enumerated(EnumType.STRING)
+    JobLevel jobLevel;
 
-    @Type(JsonBinaryType.class)
-    @Column(name = "job_types", columnDefinition = "jsonb")
-    List<JobType> jobTypes;
+    @Enumerated(EnumType.STRING)
+    JobType jobType;
 
     @Type(JsonBinaryType.class)
     @Column(name = "salary", columnDefinition = "jsonb")

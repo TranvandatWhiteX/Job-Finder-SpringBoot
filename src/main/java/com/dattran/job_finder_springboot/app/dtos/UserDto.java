@@ -35,8 +35,8 @@ public class UserDto {
 
     Address address;
 
-    @AssertTrue(message = "Recruiter must have company id!")
+    @AssertTrue(message = "Recruiter must have companyId")
     public boolean isRecruiter() {
-        return this.getRoleCodes().contains(1103L) && this.getCompanyId().isEmpty();
+        return !(this.roleCodes.contains(1103L) && (this.companyId == null || this.companyId.trim().isEmpty()));
     }
 }

@@ -6,7 +6,7 @@ import com.dattran.job_finder_springboot.domain.entities.JobPost;
 import com.dattran.job_finder_springboot.domain.entities.elasticsearch.JobPostSearch;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
-import com.dattran.job_finder_springboot.domain.services.ImportExcelService;
+import com.dattran.job_finder_springboot.domain.services.ExcelService;
 import com.dattran.job_finder_springboot.domain.services.JobPostService;
 import com.dattran.job_finder_springboot.domain.utils.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,12 +24,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/jobs")
@@ -37,7 +39,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class JobPostController {
   JobPostService jobPostService;
-  ImportExcelService importExcelService;
+  ExcelService excelService;
 
   @PostMapping
   @PreAuthorize("hasRole('RECRUITER')")
@@ -133,7 +135,7 @@ public class JobPostController {
   public ResponseEntity<InputStreamResource> downloadTemplate() {
     String fileName = "post_template.xlsx";
     ClassPathResource resource = new ClassPathResource("static/" + fileName);
-    importExcelService.exportExcel("static/post_template.xlsx");
+    excelService.exportExcel("static/post_template.xlsx");
     try (ByteArrayOutputStream out = new ByteArrayOutputStream();
         FileInputStream fis = new FileInputStream(resource.getFile())) {
       byte[] buffer = new byte[1024];
@@ -153,7 +155,36 @@ public class JobPostController {
     }
   }
 
-  // Todo: Create Job Post By Import Excel (Single)
+  @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ApiResponse<Void> importExcel(@RequestPart("file") MultipartFile file,
+                                       @RequestHeader String userId,
+                                       @RequestHeader("Authorization") String token,
+                                       HttpServletRequest httpServletRequest) {
+    if (file == null || file.isEmpty()) {
+      throw new AppException(ResponseStatus.FILE_NOT_FOUND);
+    }
+    String contentType = file.getContentType();
+    if (!isValidExcelContentType(contentType)) {
+      throw new AppException(ResponseStatus.INVALID_FILE);
+    }
+    long maxFileSize = 20 * 1024 * 1024;
+    if (file.getSize() > maxFileSize) {
+      throw new AppException(ResponseStatus.FILE_SIZE_EXCEEDED);
+    }
+    excelService.importExcel(file, userId, token, httpServletRequest);
+    return ApiResponse.<Void>builder()
+            .timestamp(LocalDateTime.now().toString())
+            .path(httpServletRequest.getRequestURI())
+            .requestMethod(httpServletRequest.getMethod())
+            .status(HttpStatus.OK)
+            .message("Import Excel Successfully!")
+            .build();
+  }
 
-  // Todo: Create Job Post By Import Excel (Multiple)
+  private boolean isValidExcelContentType(String contentType) {
+    return contentType != null
+            && (contentType.equals("application/vnd.ms-excel")
+            || contentType.equals(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+  }
 }

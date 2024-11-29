@@ -1,8 +1,16 @@
 package com.dattran.job_finder_springboot.domain.services;
 
+import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
+import com.dattran.job_finder_springboot.domain.entities.Address;
+import com.dattran.job_finder_springboot.domain.entities.Salary;
+import com.dattran.job_finder_springboot.domain.entities.User;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
+import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
+import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.BusinessStreamRepository;
+import com.dattran.job_finder_springboot.domain.utils.ProvinceUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,19 +20,23 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ImportExcelService {
+public class ExcelService {
   BusinessStreamRepository businessStreamRepository;
+  JobPostService jobPostService;
+  UserService userService;
 
   public void exportExcel(String filePath) {
     String[] columns = {
@@ -78,8 +90,9 @@ public class ImportExcelService {
       setupDataValidation(sheet, jobLevels, 1, 10, 4, 4);
       setupDataValidation(sheet, businessStreams, 1, 10, 8, 8);
       setupDataValidation(sheet, experiences, 1, 10, 7, 7);
-      setupDataValidationWithNamedRange(workbook, sheet, provinceVars, 1, 10, 10, 10);
-      setExampleData(sheet, jobLevels, jobTypes, experiences, provinceVars, businessStreams);
+      setupDataValidationWithNamedRange(workbook, sheet, ProvinceUtil.provinceVars, 1, 10, 10, 10);
+      setExampleData(
+          sheet, jobLevels, jobTypes, experiences, ProvinceUtil.provinceVars, businessStreams);
       for (int i = 0; i < columns.length; i++) {
         sheet.autoSizeColumn(i);
       }
@@ -165,69 +178,155 @@ public class ImportExcelService {
     workbook.setSheetHidden(workbook.getSheetIndex(hiddenSheet), true);
   }
 
-  private final String[] provinceVars = {
-    "01-Hà Nội",
-    "02-Hà Giang",
-    "04-Cao Bằng",
-    "06-Bắc Kạn",
-    "08-Tuyên Quang",
-    "10-Lào Cai",
-    "11-Điện Biên",
-    "12-Lai Châu",
-    "14-Sơn La",
-    "15-Yên Bái",
-    "17-Hoà Bình",
-    "19-Thái Nguyên",
-    "20-Lạng Sơn",
-    "22-Quảng Ninh",
-    "24-Bắc Giang",
-    "25-Phú Thọ",
-    "26-Vĩnh Phúc",
-    "27-Bắc Ninh",
-    "30-Hải Dương",
-    "31-Hải Phòng",
-    "33-Hưng Yên",
-    "34-Thái Bình",
-    "35-Hà Nam",
-    "36-Nam Định",
-    "37-Ninh Bình",
-    "38-Thanh Hóa",
-    "40-Nghệ An",
-    "42-Hà Tĩnh",
-    "44-Quảng Bình",
-    "45-Quảng Trị",
-    "46-Thừa Thiên Huế",
-    "48-Đà Nẵng",
-    "49-Quảng Nam",
-    "51-Quảng Ngãi",
-    "52-Bình Định",
-    "54-Phú Yên",
-    "56-Khánh Hòa",
-    "58-Ninh Thuận",
-    "60-Bình Thuận",
-    "62-Kon Tum",
-    "64-Gia Lai",
-    "66-Đắk Lắk",
-    "67-Đắk Nông",
-    "68-Lâm Đồng",
-    "70-Bình Phước",
-    "72-Tây Ninh",
-    "74-Bình Dương",
-    "75-Đồng Nai",
-    "77-Bà Rịa - Vũng Tàu",
-    "79-Hồ Chí Minh",
-    "80-Long An",
-    "82-Tiền Giang",
-    "83-Bến Tre",
-    "84-Trà Vinh",
-    "86-Vĩnh Long",
-    "87-Đồng Tháp",
-    "89-An Giang",
-    "91-Kiên Giang",
-    "92-Cần Thơ",
-    "93-Hậu Giang",
-    "94-Sóc Trăng",
-    "95-Bạc Liêu",
-    "96-Cà Mau"
-  };
+  public void importExcel(
+      MultipartFile file, String userId, String token, HttpServletRequest httpServletRequest) {
+    List<JobPostDto> jobPostDtos = createDtoFromExcelFile(file, userId, token);
+    for (JobPostDto jobPostDto : jobPostDtos) {
+      jobPostService.postJob(jobPostDto, httpServletRequest);
+    }
+  }
+
+  private List<JobPostDto> createDtoFromExcelFile(MultipartFile file, String userId, String token) {
+    List<JobPostDto> dtos = new ArrayList<>();
+    User user = userService.getUserById(userId, token);
+    if (user.getCompanyId().isEmpty()) {
+      throw new AppException(ResponseStatus.COMPANY_NOT_FOUND);
+    }
+    try (InputStream excelFile = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(excelFile)) {
+      Sheet sheet = workbook.getSheetAt(0);
+      for (Row row : sheet) {
+        if (row.getRowNum() == 0) continue;
+        String title = row.getCell(0).getStringCellValue();
+        String jobRequirement = row.getCell(1).getStringCellValue();
+        String jobDescription = row.getCell(2).getStringCellValue();
+        String benefit = row.getCell(3).getStringCellValue();
+        String jobLevel = row.getCell(4).getStringCellValue();
+        String jobType = row.getCell(5).getStringCellValue();
+        int numberRequirement = (int) row.getCell(6).getNumericCellValue();
+        String experience = row.getCell(7).getStringCellValue();
+        String business = row.getCell(8).getStringCellValue();
+        String address = row.getCell(9).getStringCellValue();
+        String province = row.getCell(10).getStringCellValue();
+        String skills = row.getCell(11).getStringCellValue();
+        String salary = row.getCell(12).getStringCellValue();
+        String expiredDate = row.getCell(13).getStringCellValue();
+        JobPostDto dto =
+            validateData(
+                title,
+                jobRequirement,
+                jobDescription,
+                benefit,
+                jobLevel,
+                jobType,
+                numberRequirement,
+                experience,
+                business,
+                address,
+                province,
+                skills,
+                salary,
+                expiredDate,
+                user.getCompanyId());
+        dtos.add(dto);
+      }
+    } catch (IOException e) {
+      throw new AppException(ResponseStatus.INVALID_EXCEL_FILE);
+    }
+    return dtos;
+  }
+
+  private JobPostDto validateData(
+      String title,
+      String jobRequirement,
+      String jobDescription,
+      String benefit,
+      String jobLevel,
+      String jobType,
+      int numberRequirement,
+      String experience,
+      String business,
+      String address,
+      String province,
+      String skills,
+      String salary,
+      String expiredDate,
+      String companyId) {
+    JobPostDto dto = new JobPostDto();
+    if (title.isEmpty()
+        || jobRequirement.isEmpty()
+        || benefit.isEmpty()
+        || jobLevel.isEmpty()
+        || jobType.isEmpty()
+        || jobDescription.isEmpty()
+        || experience.isEmpty()
+        || business.isEmpty()
+        || address.isEmpty()
+        || province.isEmpty()
+        || skills.isEmpty()
+        || expiredDate.isEmpty()
+        || companyId.isEmpty()
+        || salary.isEmpty()
+        || numberRequirement <= 0) {
+      throw new AppException(ResponseStatus.DATA_EXCEL_FILE_NULL);
+    }
+    dto.setJobTitle(title);
+    dto.setJobRequirement(jobRequirement);
+    dto.setBenefit(benefit);
+    dto.setJobDescription(jobDescription);
+    dto.setSkills(skills);
+    dto.setExpiredDate(LocalDate.parse(expiredDate));
+    dto.setCompanyId(companyId);
+    dto.setNumberRequirement((long) numberRequirement);
+    dto.setJobLevel(JobLevel.valueOf(jobLevel));
+    dto.setJobType(JobType.valueOf(jobType));
+    dto.setSalary(getSalary(salary));
+    dto.setExperience(getCode(experience));
+    dto.setAddress(getAddress(address, province));
+    dto.setBusinessCode(getCode(business));
+    return dto;
+  }
+
+  private long getCode(String value) {
+    String[] split = value.split("-");
+    return Long.parseLong(split[0]);
+  }
+
+  private Address getAddress(String address, String province) {
+    Address add = new Address();
+    long provinceCode = getCode(province);
+    add.setProvinceCode(provinceCode);
+    Map<String, String> map = toMap(address);
+    add.setWard(map.get("ward"));
+    add.setDetail(map.get("detail"));
+    add.setDistrict(map.get("district"));
+    add.setProvince(province.split("-")[1]);
+    return add;
+  }
+
+  private Salary getSalary(String salary) {
+    Salary sal = new Salary();
+    if (salary.trim().startsWith("other")) {
+      String val = salary.trim().split(":")[1];
+      sal.setOther(val);
+      return sal;
+    }
+    Map<String, String> map = toMap(salary);
+    sal.setMinSalary(Long.valueOf(map.get("minSalary")));
+    sal.setMaxSalary(Long.valueOf(map.get("maxSalary")));
+    sal.setUnit(map.get("unit"));
+    sal.setType(Salary.Type.valueOf(map.get("type")));
+    sal.setCurrency(Salary.CurrencyUnit.valueOf(map.get("currency")));
+    return sal;
+  }
+
+  private Map<String, String> toMap(String value) {
+    Map<String, String> map = new HashMap<>();
+    String[] split = value.split(";");
+    for (String s : split) {
+      String[] keyValue = s.split(":");
+      map.put(keyValue[0].trim(), keyValue[1].trim());
+    }
+    return map;
+  }
 }

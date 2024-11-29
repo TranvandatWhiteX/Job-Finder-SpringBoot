@@ -4,6 +4,7 @@ import com.dattran.job_finder_springboot.domain.entities.Address;
 import com.dattran.job_finder_springboot.domain.entities.Salary;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class JobPostDto {
     @NotNull(message = "Expired date must not be null!")
     LocalDate expiredDate;
@@ -34,10 +36,10 @@ public class JobPostDto {
     String benefit;
 
     @NotNull(message = "Job level must not be null")
-    List<JobLevel> jobLevels;
+    JobLevel jobLevel;
 
     @NotNull(message = "Job type must not be null")
-    List<JobType> jobTypes;
+    JobType jobType;
 
     @NotNull(message = "Company id must not be null")
     String companyId;
