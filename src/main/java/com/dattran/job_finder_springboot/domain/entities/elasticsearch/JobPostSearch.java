@@ -2,7 +2,6 @@ package com.dattran.job_finder_springboot.domain.entities.elasticsearch;
 
 import com.dattran.job_finder_springboot.domain.entities.Address;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
-import com.dattran.job_finder_springboot.domain.entities.JobSkill;
 import com.dattran.job_finder_springboot.domain.entities.Salary;
 import com.dattran.job_finder_springboot.domain.enums.JobLevel;
 import com.dattran.job_finder_springboot.domain.enums.JobType;
@@ -67,6 +66,6 @@ public class JobPostSearch implements Serializable {
     @Field(type = FieldType.Nested)
     BusinessStream businessStream;
 
-    @Field(type = FieldType.Nested)
-    List<JobSkill> jobSkills;
+    @Field(type = FieldType.Text)
+    String skills;
 }

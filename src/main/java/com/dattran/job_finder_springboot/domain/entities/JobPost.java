@@ -63,12 +63,8 @@ public class JobPost extends BaseEntity {
 
     Long experience;
 
-    @ManyToMany(targetEntity = JobSkill.class, fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinTable(name = "tbl_rel_job_skills",
-            joinColumns = @JoinColumn(name = "job_id"),
-            inverseJoinColumns = @JoinColumn(name = "skill_id"))
-    List<JobSkill> jobSkills;
+    @Column(columnDefinition = "TEXT", nullable = false)
+    String skills;
 
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")

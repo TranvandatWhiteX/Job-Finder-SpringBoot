@@ -19,6 +19,8 @@ public class Salary {
 
     Type type;
 
+    String other;
+
     @Getter
     @AllArgsConstructor
     public enum CurrencyUnit {

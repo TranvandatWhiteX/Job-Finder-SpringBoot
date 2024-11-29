@@ -12,4 +12,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 
-public interface JobPostRepository extends JpaRepository<JobPost, String> { }
+public interface JobPostRepository extends JpaRepository<JobPost, String> {
+    Page<JobPost> findByCompanyId(String companyId, Pageable pageable);
+}

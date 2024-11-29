@@ -46,7 +46,7 @@ public class JobPostDto {
     Address address;
 
     @Size(min = 1, message = "Skill codes must not be null")
-    List<Long> skillCodes;
+    String skills;
 
     @NotNull(message = "Salary must not be null")
     Salary salary;

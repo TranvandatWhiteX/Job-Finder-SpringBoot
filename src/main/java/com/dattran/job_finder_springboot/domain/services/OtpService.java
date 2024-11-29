@@ -39,7 +39,7 @@ public class OtpService {
 
     public boolean isOtpExpired(String userId) {
         Long expireTime = redisTemplate.getExpire(userId, TimeUnit.SECONDS);
-        return (expireTime == null || expireTime <= 0);
+        return expireTime <= 0;
     }
 
     public String getOtp(String userId) {

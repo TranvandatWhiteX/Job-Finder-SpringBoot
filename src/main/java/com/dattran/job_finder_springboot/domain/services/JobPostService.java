@@ -5,21 +5,19 @@ import com.dattran.job_finder_springboot.app.dtos.JobSearchDto;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
-import com.dattran.job_finder_springboot.domain.entities.JobSkill;
+import com.dattran.job_finder_springboot.domain.entities.elasticsearch.JobPostSearch;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.BusinessStreamRepository;
 import com.dattran.job_finder_springboot.domain.repositories.CompanyRepository;
 import com.dattran.job_finder_springboot.domain.repositories.JobPostRepository;
-import com.dattran.job_finder_springboot.domain.repositories.JobSkillRepository;
 import com.dattran.job_finder_springboot.domain.utils.FnCommon;
 import com.dattran.job_finder_springboot.domain.utils.HttpRequestUtil;
 import com.dattran.job_finder_springboot.logging.LoggingService;
 import com.dattran.job_finder_springboot.logging.entities.LogAction;
 import com.dattran.job_finder_springboot.logging.entities.ObjectName;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,8 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -38,7 +35,6 @@ import java.util.List;
 public class JobPostService {
   JobPostRepository jobPostRepository;
   LoggingService loggingService;
-  JobSkillRepository jobSkillRepository;
   CompanyRepository companyRepository;
   BusinessStreamRepository businessStreamRepository;
 
@@ -66,28 +62,17 @@ public class JobPostService {
         .append(jobPostDto.getAddress().getProvince())
         .append(".");
     jobPost.setLocation(sb.toString());
-    // Todo: Add logo from company logo
-    List<JobSkill> jobSkills = new ArrayList<>();
-    for (Long skillCode : jobPostDto.getSkillCodes()) {
-      JobSkill jobSkill =
-          jobSkillRepository
-              .findByCode(skillCode)
-              .orElseThrow(() -> new AppException(ResponseStatus.SKILL_NOT_FOUND));
-      jobSkills.add(jobSkill);
+    if (company.getAsset().getLogo() != null) {
+      jobPost.setLogoUrl(company.getAsset().getLogo());
     }
-    jobPost.setJobSkills(jobSkills);
     JobPost savedJobPost = jobPostRepository.save(jobPost);
     // Handle StackOverflowError
     for (BusinessStream business : savedJobPost.getCompany().getBusinessStreams()) {
       business.setCompanies(null);
     }
     savedJobPost.getCompany().setJobPosts(null);
-    for (JobSkill jobSkill : savedJobPost.getJobSkills()) {
-      jobSkill.setJobPosts(null);
-    }
     savedJobPost.getBusinessStream().setJobPosts(null);
     // Logging
-    // Todo: Fix stackoverflow
     loggingService.writeLogEvent(
         savedJobPost.getId(),
         LogAction.CREATE,
@@ -98,7 +83,34 @@ public class JobPostService {
     return savedJobPost;
   }
 
-  public Page<JobPost> searchJob(JobSearchDto jobSearchDto, Pageable pageable) {
+  public Page<JobPostSearch> searchJob(JobSearchDto jobSearchDto, Pageable pageable) {
     return null;
+  }
+
+  public JobPost getById(String id) {
+    return jobPostRepository.findById(id).orElseThrow(() -> new AppException(ResponseStatus.JOB_NOT_FOUND));
+  }
+
+  public void unActiveJob(String id) {
+    JobPost jobPost = getById(id);
+    jobPost.setIsActive(false);
+    jobPostRepository.save(jobPost);
+  }
+
+  public Page<JobPost> getAllJobsByCompany(String companyId, Pageable pageable) {
+    return jobPostRepository.findByCompanyId(companyId, pageable);
+  }
+
+  public JobPost updatePost(String id, @Valid JobPostDto jobPostDto) {
+    JobPost jobPost = getById(id);
+    BusinessStream businessStream =
+            businessStreamRepository
+                    .findByCode(jobPostDto.getBusinessCode())
+                    .orElseThrow(() -> new AppException(ResponseStatus.BUSINESS_STREAM_NOT_FOUND));
+    if (!Objects.equals(businessStream.getCode(), jobPost.getBusinessStream().getCode())) {
+      jobPost.setBusinessStream(businessStream);
+    }
+    FnCommon.copyProperties(jobPostDto, jobPost);
+    return jobPostRepository.save(jobPost);
   }
 }

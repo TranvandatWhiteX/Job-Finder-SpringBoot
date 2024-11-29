@@ -7,6 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResponseStatus {
     FORBIDDEN(403, "Forbidden!"),
+    DOWNLOAD_TEMPLATE_ERROR(403, "Download Template Error!"),
+    JOB_NOT_FOUND(404, "Job not found!"),
     SKILL_NOT_FOUND(404, "Skill not found!"),
     COMPANY_NOT_FOUND(404, "Company not found!"),
     BUSINESS_STREAM_NOT_FOUND(404, "Business Stream Not Found!"),

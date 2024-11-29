@@ -72,6 +72,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Map<String, Set<String>> bypassTokens = new HashMap<>();
         bypassTokens.put("/auth/login", Set.of("POST"));
         bypassTokens.put("/jobs/search", Set.of("GET"));
+        // Todo: Test, must remove
+        bypassTokens.put("/jobs/download-template", Set.of("GET"));
         bypassTokens.put("/users", Set.of("POST"));
         bypassTokens.put("/users/verify", Set.of("POST"));
         bypassTokens.put("/users/forgot-password", Set.of("POST"));

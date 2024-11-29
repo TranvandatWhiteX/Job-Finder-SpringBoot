@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class LogEvent {
     String userId;
     String ip;
-    Boolean isSystem = false;
+    Boolean isSystem;
     LogAction action;
     String objectName;
     Object preValue;

@@ -2,7 +2,6 @@ package com.dattran.job_finder_springboot.domain.entities;
 
 import com.dattran.job_finder_springboot.domain.enums.UserState;
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
