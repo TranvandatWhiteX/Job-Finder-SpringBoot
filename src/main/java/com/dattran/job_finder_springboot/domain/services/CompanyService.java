@@ -1,6 +1,7 @@
 package com.dattran.job_finder_springboot.domain.services;
 
 import com.dattran.job_finder_springboot.app.dtos.CompanyDto;
+import com.dattran.job_finder_springboot.app.dtos.CompanyFilterDto;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
@@ -18,12 +19,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -104,5 +108,21 @@ public class CompanyService {
         null,
         savedCompany);
     return savedCompany;
+  }
+
+  public Company getCompanyById(String id) {
+    return null;
+  }
+
+  public void deleteById(String id, HttpServletRequest httpServletRequest) {
+
+  }
+
+  public Company updateCompany(String id, @Valid CompanyDto companyDto, HttpServletRequest httpServletRequest) {
+    return null;
+  }
+
+  public Page<Company> getAllCompanies(CompanyFilterDto companyFilterDto, Pageable pageable) {
+    return null;
   }
 }

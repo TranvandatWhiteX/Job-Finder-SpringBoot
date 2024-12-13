@@ -2,12 +2,12 @@ package com.dattran.job_finder_springboot.domain.services;
 
 import com.dattran.job_finder_springboot.app.dtos.ChangePassDto;
 import com.dattran.job_finder_springboot.app.dtos.UserDto;
+import com.dattran.job_finder_springboot.app.dtos.UserFilterDto;
 import com.dattran.job_finder_springboot.app.dtos.VerifyDto;
 import com.dattran.job_finder_springboot.app.responses.VerifyResponse;
 import com.dattran.job_finder_springboot.domain.entities.Role;
 import com.dattran.job_finder_springboot.domain.entities.User;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
-import com.dattran.job_finder_springboot.domain.enums.UserRole;
 import com.dattran.job_finder_springboot.domain.enums.UserState;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.RoleRepository;
@@ -20,10 +20,13 @@ import com.dattran.job_finder_springboot.logging.entities.ObjectName;
 import com.dattran.job_finder_springboot.logging.entities.UserLog;
 import com.nimbusds.jwt.JWTClaimsSet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -180,5 +183,26 @@ public class UserService {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
+    }
+
+    public void deleteUser(String token, String id, HttpServletRequest httpServletRequest) {
+        User user = getUserById(id, token);
+        user.setIsDeleted(true);
+        user.setIsActive(false);
+        user.setUserState(UserState.INACTIVE);
+        userRepository.save(user);
+        // Logging
+        UserLog userLog = FnCommon.copyNonNullProperties(UserLog.class, user);
+        assert userLog != null;
+        userLog.setRoles(getRoles(user.getRoles()));
+        loggingService.writeLogEvent(id, LogAction.DELETE, HttpRequestUtil.getClientIp(httpServletRequest), ObjectName.USER.name(), null, userLog);
+    }
+
+    public Page<User> getAllUsers(UserFilterDto userFilterDto, Pageable pageable) {
+        return null;
+    }
+
+    public User updateUser(@Valid UserDto userDto, String token, String id, HttpServletRequest httpServletRequest) {
+        return null;
     }
 }

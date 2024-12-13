@@ -2,6 +2,7 @@ package com.dattran.job_finder_springboot.app.controllers;
 
 import com.dattran.job_finder_springboot.app.dtos.ChangePassDto;
 import com.dattran.job_finder_springboot.app.dtos.UserDto;
+import com.dattran.job_finder_springboot.app.dtos.UserFilterDto;
 import com.dattran.job_finder_springboot.app.dtos.VerifyDto;
 import com.dattran.job_finder_springboot.app.responses.VerifyResponse;
 import com.dattran.job_finder_springboot.domain.entities.User;
@@ -12,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -82,11 +85,43 @@ public class UserController {
                 .build();
     }
 
-    // Todo: Get All Users
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+    public ApiResponse<Page<User>> getAllUsers(@ModelAttribute UserFilterDto userFilterDto, Pageable pageable, HttpServletRequest httpServletRequest) {
+        Page<User> users = userService.getAllUsers(userFilterDto, pageable);
+        return ApiResponse.<Page<User>>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .result(users)
+                .status(HttpStatus.CREATED)
+                .message("Get User Successfully!")
+                .build();
+    }
 
-    // Todo: Filter User By .....
+    @PutMapping("/{id}")
+    public ApiResponse<User> updateUser(@RequestHeader("Authorization") String token, @RequestBody @Valid UserDto userDto, @PathVariable String id, HttpServletRequest httpServletRequest) {
+        User user = userService.updateUser(userDto, token, id, httpServletRequest);
+        return ApiResponse.<User>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .result(user)
+                .status(HttpStatus.OK)
+                .message("Update Created Successfully!")
+                .build();
+    }
 
-    // Todo: Update User
-
-    // Todo: Delete User
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
+    public ApiResponse<Void> deleteUser(@RequestHeader("Authorization") String token,@PathVariable String id, HttpServletRequest httpServletRequest) {
+        userService.deleteUser(token, id, httpServletRequest);
+        return ApiResponse.<Void>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .status(HttpStatus.CREATED)
+                .message("Get User Successfully!")
+                .build();
+    }
 }

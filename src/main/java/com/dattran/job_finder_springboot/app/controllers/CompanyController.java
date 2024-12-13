@@ -1,20 +1,21 @@
 package com.dattran.job_finder_springboot.app.controllers;
 
 import com.dattran.job_finder_springboot.app.dtos.CompanyDto;
+import com.dattran.job_finder_springboot.app.dtos.CompanyFilterDto;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.services.CompanyService;
 import com.dattran.job_finder_springboot.domain.utils.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -40,13 +41,57 @@ public class CompanyController {
                 .build();
     }
 
-    // Todo: Get All Companies
+    // Todo: Using Elasticsearch
+    @GetMapping("")
+    public ApiResponse<Page<Company>> getAllCompanies(@ModelAttribute CompanyFilterDto companyFilterDto, Pageable pageable, HttpServletRequest httpServletRequest) {
+        Page<Company> companies = companyService.getAllCompanies(companyFilterDto, pageable);
+        return ApiResponse.<Page<Company>>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .result(companies)
+                .requestMethod(httpServletRequest.getMethod())
+                .status(HttpStatus.CREATED)
+                .message("Company Created Successfully!")
+                .build();
+    }
 
-    // Todo: Get Company By Id
+    @GetMapping("/{id}")
+    public ApiResponse<Company> getCompany(@PathVariable String id, HttpServletRequest httpServletRequest) {
+        Company company = companyService.getCompanyById(id);
+        return ApiResponse.<Company>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .result(company)
+                .requestMethod(httpServletRequest.getMethod())
+                .status(HttpStatus.OK)
+                .message("Get Company Successfully!")
+                .build();
+    }
 
-    // Todo: Filter Company
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
+    public ApiResponse<Company> updateCompany(@PathVariable String id, @RequestBody @Valid CompanyDto companyDto, HttpServletRequest httpServletRequest) {
+        Company company = companyService.updateCompany(id, companyDto, httpServletRequest);
+        return ApiResponse.<Company>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .result(company)
+                .requestMethod(httpServletRequest.getMethod())
+                .status(HttpStatus.OK)
+                .message("Update Company Successfully!")
+                .build();
+    }
 
-    // Todo: Update Company
-
-    // Todo: Delete Company
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATION')")
+    public ApiResponse<Void> deleteCompany(@PathVariable String id, HttpServletRequest httpServletRequest) {
+        companyService.deleteById(id, httpServletRequest);
+        return ApiResponse.<Void>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .status(HttpStatus.OK)
+                .message("Delete Company Successfully!")
+                .build();
+    }
 }
