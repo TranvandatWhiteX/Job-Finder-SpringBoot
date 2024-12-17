@@ -49,4 +49,11 @@ public class AuthService {
         // Todo: Save token to Redis
         return new LoginResponse(accessToken, refreshToken);
     }
+
+    public void logout() {
+    }
+
+    public LoginResponse refreshToken(String refreshToken) {
+        return null;
+    }
 }

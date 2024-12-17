@@ -1,7 +1,7 @@
 package com.dattran.job_finder_springboot.domain.services;
 
 import com.dattran.job_finder_springboot.app.dtos.CompanyDto;
-import com.dattran.job_finder_springboot.app.dtos.CompanyFilterDto;
+import com.dattran.job_finder_springboot.app.dtos.UpdateCompanyDto;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
@@ -33,6 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @Service
 @Slf4j
@@ -111,18 +112,51 @@ public class CompanyService {
   }
 
   public Company getCompanyById(String id) {
+    Company company = companyRepository
+            .findById(id)
+            .orElseThrow(() -> new AppException(ResponseStatus.COMPANY_NOT_FOUND));
+    if (!company.getIsDeleted()) return company;
     return null;
   }
 
   public void deleteById(String id, HttpServletRequest httpServletRequest) {
-
+    Company company = getCompanyById(id);
+    company.setIsDeleted(true);
+    companyRepository.save(company);
   }
 
-  public Company updateCompany(String id, @Valid CompanyDto companyDto, HttpServletRequest httpServletRequest) {
-    return null;
+  public Company updateCompany(String id, @Valid UpdateCompanyDto updateCompanyDto, HttpServletRequest httpServletRequest) {
+    Company company = getCompanyById(id);
+    if (company == null) throw new AppException(ResponseStatus.COMPANY_NOT_FOUND);
+    FnCommon.copyProperties(company, updateCompanyDto);
+    List<BusinessStream> businessStreams = company.getBusinessStreams();
+    businessStreams.clear();
+    for (Long businessCode : updateCompanyDto.getBusinessCodes()) {
+      BusinessStream businessStream =
+              businessStreamRepository
+                      .findByCode(businessCode)
+                      .orElseThrow(() -> new AppException(ResponseStatus.BUSINESS_STREAM_NOT_FOUND));
+      businessStreams.add(businessStream);
+    }
+    company.setBusinessStreams(businessStreams);
+    Company savedCompany = companyRepository.save(company);
+    // Logging
+    loggingService.writeLogEvent(
+            savedCompany.getId(),
+            LogAction.UPDATE,
+            HttpRequestUtil.getClientIp(httpServletRequest),
+            ObjectName.COMPANY.name(),
+            company,
+            savedCompany);
+    return company;
   }
 
-  public Page<Company> getAllCompanies(CompanyFilterDto companyFilterDto, Pageable pageable) {
-    return null;
+  public Page<Company> getCompanies(String name, Pageable pageable) {
+    if (Optional.ofNullable(name).isPresent()) {
+      // Using elasticsearch
+      return null;
+    } else {
+      return companyRepository.findAll(pageable);
+    }
   }
 }

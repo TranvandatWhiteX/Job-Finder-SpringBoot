@@ -1,14 +1,13 @@
 package com.dattran.job_finder_springboot.app.controllers;
 
 import com.dattran.job_finder_springboot.app.dtos.CompanyDto;
-import com.dattran.job_finder_springboot.app.dtos.CompanyFilterDto;
+import com.dattran.job_finder_springboot.app.dtos.UpdateCompanyDto;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.services.CompanyService;
 import com.dattran.job_finder_springboot.domain.utils.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
@@ -43,8 +42,8 @@ public class CompanyController {
 
     // Todo: Using Elasticsearch
     @GetMapping("")
-    public ApiResponse<Page<Company>> getAllCompanies(@ModelAttribute CompanyFilterDto companyFilterDto, Pageable pageable, HttpServletRequest httpServletRequest) {
-        Page<Company> companies = companyService.getAllCompanies(companyFilterDto, pageable);
+    public ApiResponse<Page<Company>> getCompanies(@RequestParam(required = false) String name, Pageable pageable, HttpServletRequest httpServletRequest) {
+        Page<Company> companies = companyService.getCompanies(name, pageable);
         return ApiResponse.<Page<Company>>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
@@ -70,8 +69,8 @@ public class CompanyController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATION')")
-    public ApiResponse<Company> updateCompany(@PathVariable String id, @RequestBody @Valid CompanyDto companyDto, HttpServletRequest httpServletRequest) {
-        Company company = companyService.updateCompany(id, companyDto, httpServletRequest);
+    public ApiResponse<Company> updateCompany(@PathVariable String id, @RequestBody @Valid UpdateCompanyDto updateCompanyDto, HttpServletRequest httpServletRequest) {
+        Company company = companyService.updateCompany(id, updateCompanyDto, httpServletRequest);
         return ApiResponse.<Company>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())

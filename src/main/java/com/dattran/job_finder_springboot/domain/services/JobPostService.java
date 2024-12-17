@@ -2,6 +2,7 @@ package com.dattran.job_finder_springboot.domain.services;
 
 import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
 import com.dattran.job_finder_springboot.app.dtos.JobSearchDto;
+import com.dattran.job_finder_springboot.domain.entities.Asset;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -62,9 +64,9 @@ public class JobPostService {
         .append(jobPostDto.getAddress().getProvince())
         .append(".");
     jobPost.setLocation(sb.toString());
-    if (company.getAsset().getLogo() != null) {
-      jobPost.setLogoUrl(company.getAsset().getLogo());
-    }
+    Optional.ofNullable(company.getAsset())
+            .map(Asset::getLogo)
+            .ifPresent(jobPost::setLogoUrl);
     JobPost savedJobPost = jobPostRepository.save(jobPost);
     // Handle StackOverflowError
     for (BusinessStream business : savedJobPost.getCompany().getBusinessStreams()) {

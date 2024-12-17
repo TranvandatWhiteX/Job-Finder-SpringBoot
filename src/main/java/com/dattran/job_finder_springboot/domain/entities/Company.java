@@ -52,6 +52,9 @@ public class Company {
     @Column(columnDefinition = "jsonb")
     Asset asset;
 
+    @Column(name = "is_deleted")
+    Boolean isDeleted = false;
+
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "tbl_rel_company_business",

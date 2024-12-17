@@ -37,23 +37,31 @@ public class AuthenticationController {
                 .message("Login Successfully!")
                 .build();
     }
-    // Todo: Logout
+
     @PostMapping("/logout")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ApiResponse<LoginResponse> logout(HttpServletRequest httpServletRequest) {
-        return null;
+    public ApiResponse<Void> logout(HttpServletRequest httpServletRequest) {
+        authService.logout();
+        return ApiResponse.<Void>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .status(HttpStatus.OK)
+                .message("Logout Successfully!")
+                .build();
     }
 
-    // Todo: Forgot Password
-    @PostMapping("/forgot-password")
-    public ApiResponse<LoginResponse> forgotPassword(HttpServletRequest httpServletRequest) {
-        return null;
-    }
-
-    // Todo: Refresh Token
     @PostMapping("/refresh-token")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ApiResponse<LoginResponse> refreshToken(HttpServletRequest httpServletRequest) {
-        return null;
+    public ApiResponse<LoginResponse> refreshToken(@RequestBody String refreshToken, HttpServletRequest httpServletRequest) {
+        LoginResponse response = authService.refreshToken(refreshToken);
+        return ApiResponse.<LoginResponse>builder()
+                .timestamp(LocalDateTime.now().toString())
+                .path(httpServletRequest.getRequestURI())
+                .requestMethod(httpServletRequest.getMethod())
+                .result(response)
+                .status(HttpStatus.OK)
+                .message("Refresh Token Successfully!")
+                .build();
     }
 }

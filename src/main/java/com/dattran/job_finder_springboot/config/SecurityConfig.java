@@ -47,9 +47,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/webjars/swagger-ui/**",
             "/swagger-ui/index.html",
-            "/jobs/search",
-            // Todo: Test, must remove
-            "/jobs/download-template"
+            "/jobs/search"
     };
 
     @Bean
