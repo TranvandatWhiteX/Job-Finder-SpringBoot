@@ -64,8 +64,8 @@ public class JobPostDto {
     @Positive(message = "Business code must greater than 0")
     Long businessCode;
 
-    @AssertTrue(message = "Expired date must be at least 14 days from today!")
-    public boolean isExpiredDateValid() {
-        return expiredDate != null && expiredDate.isAfter(LocalDate.now().plusDays(14));
-    }
+//    @AssertTrue(message = "Expired date must be at least 14 days from today!")
+//    public boolean isExpiredDateValid() {
+//        return expiredDate != null && expiredDate.isAfter(LocalDate.now().plusDays(14));
+//    }
 }
