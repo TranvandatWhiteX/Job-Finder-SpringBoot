@@ -20,11 +20,13 @@ public class JobPostActivity extends BaseEntity {
     @Column(name = "apply_date")
     LocalDateTime applyDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
+    String userId;
 
-    @ManyToOne
-    @JoinColumn(name = "job_post_id")
-    JobPost jobPost;
+    String jobId;
+
+    String fullName;
+
+    String description;
+
+    String resumeLink;
 }
