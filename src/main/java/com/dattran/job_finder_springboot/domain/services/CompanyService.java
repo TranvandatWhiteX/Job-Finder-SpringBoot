@@ -99,16 +99,15 @@ public class CompanyService {
       businessStreams.add(businessStream);
     }
     company.setBusinessStreams(businessStreams);
-    Company savedCompany = companyRepository.save(company);
-    // Logging
-    loggingService.writeLogEvent(
-        savedCompany.getId(),
-        LogAction.CREATE,
-        HttpRequestUtil.getClientIp(httpServletRequest),
-        ObjectName.COMPANY.name(),
-        null,
-        savedCompany);
-    return savedCompany;
+      // Logging
+//    loggingService.writeLogEvent(
+//        savedCompany.getId(),
+//        LogAction.CREATE,
+//        HttpRequestUtil.getClientIp(httpServletRequest),
+//        ObjectName.COMPANY.name(),
+//        null,
+//        savedCompany);
+    return companyRepository.save(company);
   }
 
   public Company getCompanyById(String id) {
@@ -151,12 +150,7 @@ public class CompanyService {
     return company;
   }
 
-  public Page<Company> getCompanies(String name, Pageable pageable) {
-    if (Optional.ofNullable(name).isPresent()) {
-      // Using elasticsearch
-      return null;
-    } else {
-      return companyRepository.findAll(pageable);
-    }
+  public List<Company> getCompanies() {
+    return companyRepository.findAll();
   }
 }

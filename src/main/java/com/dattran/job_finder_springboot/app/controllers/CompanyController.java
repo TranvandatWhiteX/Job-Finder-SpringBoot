@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/companies")
@@ -26,7 +27,7 @@ public class CompanyController {
     CompanyService companyService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRATION')")
+//    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ApiResponse<Company> addCompany(@RequestBody @Valid CompanyDto companyDto,
                                            HttpServletRequest httpServletRequest) {
         Company company = companyService.addCompany(companyDto, httpServletRequest);
@@ -40,11 +41,10 @@ public class CompanyController {
                 .build();
     }
 
-    // Todo: Using Elasticsearch
     @GetMapping("")
-    public ApiResponse<Page<Company>> getCompanies(@RequestParam(required = false) String name, Pageable pageable, HttpServletRequest httpServletRequest) {
-        Page<Company> companies = companyService.getCompanies(name, pageable);
-        return ApiResponse.<Page<Company>>builder()
+    public ApiResponse<List<Company>> getCompanies(HttpServletRequest httpServletRequest) {
+        List<Company> companies = companyService.getCompanies();
+        return ApiResponse.<List<Company>>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
                 .result(companies)
@@ -68,7 +68,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRATION')")
+//    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ApiResponse<Company> updateCompany(@PathVariable String id, @RequestBody @Valid UpdateCompanyDto updateCompanyDto, HttpServletRequest httpServletRequest) {
         Company company = companyService.updateCompany(id, updateCompanyDto, httpServletRequest);
         return ApiResponse.<Company>builder()
@@ -82,7 +82,7 @@ public class CompanyController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRATION')")
+//    @PreAuthorize("hasRole('ADMINISTRATION')")
     public ApiResponse<Void> deleteCompany(@PathVariable String id, HttpServletRequest httpServletRequest) {
         companyService.deleteById(id, httpServletRequest);
         return ApiResponse.<Void>builder()

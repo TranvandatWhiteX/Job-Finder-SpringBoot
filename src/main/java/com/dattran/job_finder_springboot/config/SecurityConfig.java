@@ -25,7 +25,7 @@ import java.util.Set;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    JwtAuthenticationFilter jwtAuthenticationFilter;
+//    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     String[] PUBLIC_ENDPOINTS_POST = {
             "/users",

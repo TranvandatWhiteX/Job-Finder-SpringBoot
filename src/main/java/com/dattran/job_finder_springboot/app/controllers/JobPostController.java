@@ -3,7 +3,6 @@ package com.dattran.job_finder_springboot.app.controllers;
 import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
 import com.dattran.job_finder_springboot.app.dtos.JobSearchDto;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
-import com.dattran.job_finder_springboot.domain.entities.elasticsearch.JobPostSearch;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.services.ExcelService;
@@ -56,21 +55,21 @@ public class JobPostController {
         .build();
   }
 
-  @GetMapping("/search")
-  public ApiResponse<Page<JobPostSearch>> searchJob(
-      @ModelAttribute @Valid JobSearchDto jobSearchDto,
-      Pageable pageable,
-      HttpServletRequest httpServletRequest) {
-    Page<JobPostSearch> jobPosts = jobPostService.searchJob(jobSearchDto, pageable);
-    return ApiResponse.<Page<JobPostSearch>>builder()
-        .timestamp(LocalDateTime.now().toString())
-        .path(httpServletRequest.getRequestURI())
-        .requestMethod(httpServletRequest.getMethod())
-        .result(jobPosts)
-        .status(HttpStatus.OK)
-        .message("Search Jobs Successfully!")
-        .build();
-  }
+//  @GetMapping("/search")
+//  public ApiResponse<Page<JobPostSearch>> searchJob(
+//      @ModelAttribute @Valid JobSearchDto jobSearchDto,
+//      Pageable pageable,
+//      HttpServletRequest httpServletRequest) {
+//    Page<JobPostSearch> jobPosts = jobPostService.searchJob(jobSearchDto, pageable);
+//    return ApiResponse.<Page<JobPostSearch>>builder()
+//        .timestamp(LocalDateTime.now().toString())
+//        .path(httpServletRequest.getRequestURI())
+//        .requestMethod(httpServletRequest.getMethod())
+//        .result(jobPosts)
+//        .status(HttpStatus.OK)
+//        .message("Search Jobs Successfully!")
+//        .build();
+//  }
 
   @PutMapping("/{id}")
 //  @PreAuthorize("hasRole('RECRUITER')")

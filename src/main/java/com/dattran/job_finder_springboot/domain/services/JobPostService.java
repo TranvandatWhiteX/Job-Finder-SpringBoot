@@ -6,7 +6,6 @@ import com.dattran.job_finder_springboot.domain.entities.Asset;
 import com.dattran.job_finder_springboot.domain.entities.BusinessStream;
 import com.dattran.job_finder_springboot.domain.entities.Company;
 import com.dattran.job_finder_springboot.domain.entities.JobPost;
-import com.dattran.job_finder_springboot.domain.entities.elasticsearch.JobPostSearch;
 import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.BusinessStreamRepository;
@@ -85,9 +84,9 @@ public class JobPostService {
     return savedJobPost;
   }
 
-  public Page<JobPostSearch> searchJob(JobSearchDto jobSearchDto, Pageable pageable) {
-    return null;
-  }
+//  public Page<JobPostSearch> searchJob(JobSearchDto jobSearchDto, Pageable pageable) {
+//    return null;
+//  }
 
   public JobPost getById(String id) {
     return jobPostRepository.findById(id).orElseThrow(() -> new AppException(ResponseStatus.JOB_NOT_FOUND));
