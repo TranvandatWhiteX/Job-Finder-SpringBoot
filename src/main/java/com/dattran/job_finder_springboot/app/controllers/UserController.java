@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @PostMapping("/change-password/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
+//    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
     public ApiResponse<Void> changePassword(@RequestHeader("Authorization") String token,
                                             @PathVariable String id,
                                             @RequestBody @Valid ChangePassDto changePassDto,
@@ -71,10 +71,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
-    public ApiResponse<User> getUserById(@RequestHeader("Authorization") String token,
-                                         @PathVariable String id, HttpServletRequest httpServletRequest) {
-        User user = userService.getUserById(id, token);
+//    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
+    public ApiResponse<User> getUserById(@PathVariable String id, HttpServletRequest httpServletRequest) {
+        User user = userService.getUserById(id);
         return ApiResponse.<User>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
@@ -86,7 +85,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
+//    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
     public ApiResponse<Page<User>> getAllUsers(@ModelAttribute UserFilterDto userFilterDto, Pageable pageable, HttpServletRequest httpServletRequest) {
         Page<User> users = userService.getAllUsers(userFilterDto, pageable);
         return ApiResponse.<Page<User>>builder()
@@ -100,8 +99,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<User> updateUser(@RequestHeader("Authorization") String token, @RequestBody @Valid UserDto userDto, @PathVariable String id, HttpServletRequest httpServletRequest) {
-        User user = userService.updateUser(userDto, token, id, httpServletRequest);
+    public ApiResponse<User> updateUser(@RequestBody @Valid UserDto userDto, @PathVariable String id, HttpServletRequest httpServletRequest) {
+        User user = userService.updateUser(userDto, id, httpServletRequest);
         return ApiResponse.<User>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
@@ -113,9 +112,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
-    public ApiResponse<Void> deleteUser(@RequestHeader("Authorization") String token,@PathVariable String id, HttpServletRequest httpServletRequest) {
-        userService.deleteUser(token, id, httpServletRequest);
+//    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_RECRUITER')")
+    public ApiResponse<Void> deleteUser(@PathVariable String id, HttpServletRequest httpServletRequest) {
+        userService.deleteUser(id, httpServletRequest);
         return ApiResponse.<Void>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())

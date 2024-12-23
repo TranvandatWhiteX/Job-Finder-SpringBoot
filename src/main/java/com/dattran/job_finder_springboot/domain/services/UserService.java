@@ -145,19 +145,14 @@ public class UserService {
                 .build();
     }
 
-    public User getUserById(String id, String token) {
-        final String auth = token.substring(7);
-        JWTClaimsSet claims = jwtService.getAllClaimsFromToken(auth);
-        String email = (String) claims.getClaim("email");
-        User user = getUserById(id);
-        if (!user.getEmail().equals(email)) {
-            throw new AppException(ResponseStatus.FORBIDDEN);
-        }
-        return user;
+    public User getUserById(String id) {
+        return userRepository
+                .findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
     }
 
     public void changePassword(String token, String id, ChangePassDto changePassDto) {
-        User user = getUserById(id, token);
+        User user = getUserById(id);
         boolean isMatch = passwordEncoder.matches(changePassDto.getOldPass(), user.getPassword());
         if (!isMatch) {
             throw new AppException(ResponseStatus.PASSWORD_NOT_MATCH);
@@ -179,14 +174,8 @@ public class UserService {
                 variables);
     }
 
-    private User getUserById(String id) {
-        return userRepository
-                .findById(id)
-                .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
-    }
-
-    public void deleteUser(String token, String id, HttpServletRequest httpServletRequest) {
-        User user = getUserById(id, token);
+    public void deleteUser(String id, HttpServletRequest httpServletRequest) {
+        User user = getUserById(id);
         user.setIsDeleted(true);
         user.setIsActive(false);
         user.setUserState(UserState.INACTIVE);
@@ -202,7 +191,7 @@ public class UserService {
         return null;
     }
 
-    public User updateUser(@Valid UserDto userDto, String token, String id, HttpServletRequest httpServletRequest) {
+    public User updateUser(@Valid UserDto userDto, String id, HttpServletRequest httpServletRequest) {
         return null;
     }
 }

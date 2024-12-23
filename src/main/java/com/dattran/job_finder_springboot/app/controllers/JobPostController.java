@@ -42,7 +42,7 @@ public class JobPostController {
   ExcelService excelService;
 
   @PostMapping
-  @PreAuthorize("hasRole('RECRUITER')")
+//  @PreAuthorize("hasRole('RECRUITER')")
   public ApiResponse<JobPost> postJob(
       @RequestBody @Valid JobPostDto jobPostDto, HttpServletRequest httpServletRequest) {
     JobPost jobPost = jobPostService.postJob(jobPostDto, httpServletRequest);
@@ -73,7 +73,7 @@ public class JobPostController {
   }
 
   @PutMapping("/{id}")
-  @PreAuthorize("hasRole('RECRUITER')")
+//  @PreAuthorize("hasRole('RECRUITER')")
   public ApiResponse<JobPost> updateJob(
       @PathVariable("id") String id,
       @RequestBody @Valid JobPostDto jobPostDto,
@@ -90,7 +90,7 @@ public class JobPostController {
   }
 
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasRole('RECRUITER')")
+//  @PreAuthorize("hasRole('RECRUITER')")
   public ApiResponse<Void> unActiveJob(
       @PathVariable String id, HttpServletRequest httpServletRequest) {
     jobPostService.unActiveJob(id);
@@ -158,7 +158,6 @@ public class JobPostController {
   @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ApiResponse<Void> importExcel(@RequestPart("file") MultipartFile file,
                                        @RequestHeader String userId,
-                                       @RequestHeader("Authorization") String token,
                                        HttpServletRequest httpServletRequest) {
     if (file == null || file.isEmpty()) {
       throw new AppException(ResponseStatus.FILE_NOT_FOUND);
@@ -171,7 +170,7 @@ public class JobPostController {
     if (file.getSize() > maxFileSize) {
       throw new AppException(ResponseStatus.FILE_SIZE_EXCEEDED);
     }
-    excelService.importExcel(file, userId, token, httpServletRequest);
+    excelService.importExcel(file, userId, httpServletRequest);
     return ApiResponse.<Void>builder()
             .timestamp(LocalDateTime.now().toString())
             .path(httpServletRequest.getRequestURI())

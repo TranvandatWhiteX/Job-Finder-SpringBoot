@@ -179,16 +179,16 @@ public class ExcelService {
   }
 
   public void importExcel(
-      MultipartFile file, String userId, String token, HttpServletRequest httpServletRequest) {
-    List<JobPostDto> jobPostDtos = createDtoFromExcelFile(file, userId, token);
+      MultipartFile file, String userId, HttpServletRequest httpServletRequest) {
+    List<JobPostDto> jobPostDtos = createDtoFromExcelFile(file, userId);
     for (JobPostDto jobPostDto : jobPostDtos) {
       jobPostService.postJob(jobPostDto, httpServletRequest);
     }
   }
 
-  private List<JobPostDto> createDtoFromExcelFile(MultipartFile file, String userId, String token) {
+  private List<JobPostDto> createDtoFromExcelFile(MultipartFile file, String userId) {
     List<JobPostDto> dtos = new ArrayList<>();
-    User user = userService.getUserById(userId, token);
+    User user = userService.getUserById(userId);
     if (user.getCompanyId().isEmpty()) {
       throw new AppException(ResponseStatus.COMPANY_NOT_FOUND);
     }
