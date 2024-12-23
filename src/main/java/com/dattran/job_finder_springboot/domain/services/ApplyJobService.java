@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,6 +38,7 @@ public class ApplyJobService {
                 .orElseThrow(() -> new AppException(ResponseStatus.USER_NOT_FOUND));
         JobPostActivity jobPostActivity = FnCommon.copyNonNullProperties(JobPostActivity.class, applyJobDto);
         assert jobPostActivity != null;
+        jobPostActivity.setApplyDate(LocalDateTime.now());
         return jobPostActivityRepository.save(jobPostActivity);
     }
 
