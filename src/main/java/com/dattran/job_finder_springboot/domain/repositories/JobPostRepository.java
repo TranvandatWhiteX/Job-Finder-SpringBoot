@@ -35,3 +35,4 @@ public interface JobPostRepository extends JpaRepository<JobPost, String> {
       @Param("minSalary") long minSalary,
       @Param("maxSalary") long maxSalary);
 }
+

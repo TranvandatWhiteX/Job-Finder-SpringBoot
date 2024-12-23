@@ -1,5 +1,6 @@
 package com.dattran.job_finder_springboot.domain.services;
 
+import com.dattran.job_finder_springboot.app.dtos.ApplicationsByMonth;
 import com.dattran.job_finder_springboot.app.dtos.JobPostDto;
 import com.dattran.job_finder_springboot.app.dtos.JobSearchDto;
 import com.dattran.job_finder_springboot.domain.entities.Asset;
@@ -10,6 +11,7 @@ import com.dattran.job_finder_springboot.domain.enums.ResponseStatus;
 import com.dattran.job_finder_springboot.domain.exceptions.AppException;
 import com.dattran.job_finder_springboot.domain.repositories.BusinessStreamRepository;
 import com.dattran.job_finder_springboot.domain.repositories.CompanyRepository;
+import com.dattran.job_finder_springboot.domain.repositories.JobPostActivityRepository;
 import com.dattran.job_finder_springboot.domain.repositories.JobPostRepository;
 import com.dattran.job_finder_springboot.domain.utils.FnCommon;
 import com.dattran.job_finder_springboot.domain.utils.HttpRequestUtil;
@@ -39,6 +41,7 @@ public class JobPostService {
   LoggingService loggingService;
   CompanyRepository companyRepository;
   BusinessStreamRepository businessStreamRepository;
+  JobPostActivityRepository jobPostActivityRepository;
 
   public JobPost postJob(JobPostDto jobPostDto, HttpServletRequest httpServletRequest) {
     Company company =
@@ -87,6 +90,16 @@ public class JobPostService {
 
   public List<JobPost> searchJob(JobSearchDto jobSearchDto) {
     return jobPostRepository.searchJobs(jobSearchDto.getProvinceCode(), jobSearchDto.getKeyword(), jobSearchDto.getExperience(), jobSearchDto.getMinSalary(), jobSearchDto.getMaxSalary());
+  }
+
+  public List<ApplicationsByMonth> getApplicationsCountByYear(String year) {
+    List<Object[]> results = jobPostActivityRepository.getApplicationsCountByYear(year);
+    return results.stream()
+            .map(result -> new ApplicationsByMonth(
+                    result[0].toString(), // Month (String)
+                    ((Number) result[1]).intValue() // Total applications (int)
+            ))
+            .toList();
   }
 
   public JobPost getById(String id) {
