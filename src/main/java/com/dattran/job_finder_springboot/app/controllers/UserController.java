@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -86,9 +87,9 @@ public class UserController {
 
     @GetMapping
 //    @PreAuthorize("hasRole('ROLE_ADMINISTRATOR')")
-    public ApiResponse<Page<User>> getAllUsers(@ModelAttribute UserFilterDto userFilterDto, Pageable pageable, HttpServletRequest httpServletRequest) {
-        Page<User> users = userService.getAllUsers(userFilterDto, pageable);
-        return ApiResponse.<Page<User>>builder()
+    public ApiResponse<List<User>> getAllUsers(HttpServletRequest httpServletRequest) {
+        List<User> users = userService.getAllUsers();
+        return ApiResponse.<List<User>>builder()
                 .timestamp(LocalDateTime.now().toString())
                 .path(httpServletRequest.getRequestURI())
                 .requestMethod(httpServletRequest.getMethod())

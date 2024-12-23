@@ -187,8 +187,8 @@ public class UserService {
         loggingService.writeLogEvent(id, LogAction.DELETE, HttpRequestUtil.getClientIp(httpServletRequest), ObjectName.USER.name(), null, userLog);
     }
 
-    public Page<User> getAllUsers(UserFilterDto userFilterDto, Pageable pageable) {
-        return null;
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public User updateUser(@Valid UserDto userDto, String id, HttpServletRequest httpServletRequest) {
