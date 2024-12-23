@@ -13,13 +13,7 @@ import lombok.experimental.FieldDefaults;
 public class JobSearchDto {
   String keyword;
 
-  Long provinceCode;
-
-  BusinessType businessType;
-
-  JobLevel jobLevel;
-
-  JobType jobType;
+  String provinceCode;
 
   Long experience;
 
@@ -34,9 +28,6 @@ public class JobSearchDto {
     boolean allFieldsNotNull =
         keyword != null
             || provinceCode != null
-            || businessType != null
-            || jobLevel != null
-            || jobType != null
             || experience != null
             || minSalary != null
             || maxSalary != null;

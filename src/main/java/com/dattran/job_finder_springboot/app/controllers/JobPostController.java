@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -55,21 +56,20 @@ public class JobPostController {
         .build();
   }
 
-//  @GetMapping("/search")
-//  public ApiResponse<Page<JobPostSearch>> searchJob(
-//      @ModelAttribute @Valid JobSearchDto jobSearchDto,
-//      Pageable pageable,
-//      HttpServletRequest httpServletRequest) {
-//    Page<JobPostSearch> jobPosts = jobPostService.searchJob(jobSearchDto, pageable);
-//    return ApiResponse.<Page<JobPostSearch>>builder()
-//        .timestamp(LocalDateTime.now().toString())
-//        .path(httpServletRequest.getRequestURI())
-//        .requestMethod(httpServletRequest.getMethod())
-//        .result(jobPosts)
-//        .status(HttpStatus.OK)
-//        .message("Search Jobs Successfully!")
-//        .build();
-//  }
+  @GetMapping("/search")
+  public ApiResponse<List<JobPost>> searchJob(
+      @RequestBody @Valid JobSearchDto jobSearchDto,
+      HttpServletRequest httpServletRequest) {
+    List<JobPost> jobPosts = jobPostService.searchJob(jobSearchDto);
+    return ApiResponse.<List<JobPost>>builder()
+        .timestamp(LocalDateTime.now().toString())
+        .path(httpServletRequest.getRequestURI())
+        .requestMethod(httpServletRequest.getMethod())
+        .result(jobPosts)
+        .status(HttpStatus.OK)
+        .message("Search Jobs Successfully!")
+        .build();
+  }
 
   @PutMapping("/{id}")
 //  @PreAuthorize("hasRole('RECRUITER')")

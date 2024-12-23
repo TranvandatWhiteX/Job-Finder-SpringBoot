@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -84,9 +85,9 @@ public class JobPostService {
     return savedJobPost;
   }
 
-//  public Page<JobPostSearch> searchJob(JobSearchDto jobSearchDto, Pageable pageable) {
-//    return null;
-//  }
+  public List<JobPost> searchJob(JobSearchDto jobSearchDto) {
+    return jobPostRepository.searchJobs(jobSearchDto.getProvinceCode(), jobSearchDto.getKeyword(), jobSearchDto.getExperience(), jobSearchDto.getMinSalary(), jobSearchDto.getMaxSalary());
+  }
 
   public JobPost getById(String id) {
     return jobPostRepository.findById(id).orElseThrow(() -> new AppException(ResponseStatus.JOB_NOT_FOUND));
